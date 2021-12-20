@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Axon Admin</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="vendors/feather/feather.css">
+  <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
+  <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+  <!-- endinject -->
+  <!-- Plugin css for this page -->
+  <link rel="stylesheet" href="vendors/datatables.net-bs4/dataTables.bootstrap4.css">
+  <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
+  <link rel="stylesheet" type="text/css" href="js/select.dataTables.min.css">
+  <!-- End plugin css for this page -->
+  <!-- inject:css -->
+  <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src=http://d3js.org/d3.v3.min.js></script>
+  <script src="js/raphael.js"></script>
+  <script src="js/treant.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <!-- endinject -->
+  <link rel="shortcut icon" href="images/Shortcut Logo.png" />
+
+  <style>
+    
+        .link {
+      stroke: #ff6600;
+      opacity: 100;
+      stroke-width: 5px;
+    }
+    .node circle {
+      stroke: rgb(255, 255, 255);
+      opacity: 100;
+      stroke-width: 3px;
+    }
+    text {
+      font: 25px serif;
+      opacity: 100;
+      pointer-events:none;
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: auto auto;
+    }
+    .grid-item {
+      background-color: inherit;
+      border: 1px;
+      padding:inherit;
+      text-align: center;
+      width: auto;
+    }
+    #confirm {
+          display: none;
+          background-color: #ff6600;
+          color: #000000;
+          border: 4px solid rgba(255, 255, 255, 0.871);
+          position: fixed;
+          width: 300px;
+          height: 100px;
+          left: 40%;
+          top: 40%;
+          box-sizing: border-box;
+          text-align: center;
+        }
+        #confirm button {
+          background-color: #0e2a5d;
+          display: inline-block;
+          border-radius: 12px;
+          border: 4px solid rgb(255, 255, 255);
+          padding: 5px;
+          text-align: center;
+          width: 60px;
+          cursor: pointer;
+          color: #ffff;
+        }
+        #confirm .message {
+          text-align: left;
+          background-color: #ff6600;
+          color: black;
+          text-align: center;
+          margin-top: 5px;
+        }
+  </style>
+
+<script>
+
+  graph=[]
+  mainlinks=[]
+
+
+  function showgraph(links){
+
+    document.getElementById("mesh").innerHTML=""
+
+    var nodes = {}
+
+    // Compute the distinct nodes from the links.
+    links.forEach(function(link) {
+    link.source = nodes[link.source] ||
+    (nodes[link.source] = {name: link.source});
+    link.target = nodes[link.target] ||
+    (nodes[link.target] = {name: link.target});
+    link.value = +link.value;
+    });
+
+    var width = 350
+    height = 400;
+
+    var force = d3.layout.force()
+    .nodes(d3.values(nodes))
+    .links(links)
+    .size([width, height])
+    .linkDistance(80)
+    .charge(-100)
+    .on("tick", tick)
+    .start();
+
+    var svg = d3.select("#mesh").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+    var link = svg.selectAll(".link")
+    .data(force.links())
+    .enter().append("line")
+    .attr("class", "link");
+
+    var node = svg.selectAll(".node")
+    .data(force.nodes())
+    .enter().append("g")
+    .attr("class", "node")
+    .on("click", click)
+    .call(force.drag);
+
+    node.append("circle")
+    .attr("r", 11)
+    .style("fill", "#3182bd");
+
+    node.append("text")
+    .attr("x", 12)
+    .attr("dy", ".35em")
+    .style("fill", "#3182bd")
+    .text(function(d) { return d.name; });
+
+    function tick() {
+    link
+    .attr("x1", function(d) { return d.source.x; })
+    .attr("y1", function(d) { return d.source.y; })
+    .attr("x2", function(d) { return d.target.x; })
+    .attr("y2", function(d) { return d.target.y; });
+
+    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+    }
+
+
+    // action to take on mouse click
+    function click() {
+    d3.select(this).select("text").transition()
+    .duration(750)
+    .attr("x", 22)
+    .style("stroke-width", ".5px")
+    .style("opacity", 1)
+    .style("fill", "#E34A33")
+    .style("font", "25px serif");
+    // d3.select(this).select("circle").transition()
+    // .duration(750)
+    // .style("fill", "#E34A33")
+    // .attr("r", 16);
+    }
+
+  }
+
+  function drawgraph(){
+    links=[];
+    for (i = 1; i<graph.length; i++) {
+      var objs = {"source" : graph[0],"target": graph[i]};
+      links.push(objs)
+    }
+    // console.log("Links ",links);
+    if (mainlinks.length==0){
+      for(i=0;i<links.length;i++){
+        mainlinks.push(links[i])
+      }
+    }
+    else{
+      for (i=0; i<links.length; i++){
+        var iseql = objeql(links[i], mainlinks);
+        if(iseql==0){
+          mainlinks.push(links[i])
+        }
+      }
+    }
+    // console.log("main linsk ", mainlinks);
+    showgraph(links)
+  }
+
+  function objeql(obj1,dataarr) {
+    flag=0
+    for(j=0;j<dataarr.length;j++){
+      if (obj1.source == dataarr[j].source && obj1.target == dataarr[j].target) {
+        flag=1;
+        break;
+      }
+      else{
+        flag=0;
+      }
+    }
+    if (flag==0)
+    {
+      return 0;
+    }
+    else{
+      return 1;
+    }
+  }
+  
+  function getroot(str){
+    var arr = str.split("/");
+    var info = graph.includes(arr[7])
+    if(info==false){
+      graph.push(arr[7])
+    }
+  }
+
+  function  getContent4(url){
+    var req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        res = req.responseXML;
+        res1 = res.getElementsByTagName("Element");
+        if (url.search("Ask") > 0){
+          document.getElementById("innertable").innerHTML=""
+          var hd2 = []
+          var td2 = []
+          for (i = 0; i< res1.length;i++){
+            if(res1[i].children[1].innerHTML=="date"){
+              if(res1[i].children.length==3){
+                //document.getElementById("innertable").innerHTML+="<tr><td>"+res1[i].children[0].innerHTML+" :</td> <td><input class='form-control' type='date' value='"+res1[i].children[2].innerHTML+"'> </td></tr>"
+                hd2.push(res1[i].children[0].innerHTML)
+                td2.push("<td><input class='form-control' type='date' id='twoask"+i+"' value='"+res1[i].children[2].innerHTML+"'> </td>")
+              }else{
+                //document.getElementById("innertable").innerHTML+="<tr><td>"+res1[i].children[0].innerHTML+" :</td> <td><input class='form-control' type='date'> </td></tr>"
+                hd2.push(res1[i].children[0].innerHTML)
+                td2.push("<td><input class='form-control' type='date' id='twoask"+i+"'> </td>")
+              }
+              }
+              else if(res1[i].children[1].innerHTML=="number"){
+                if(res1[i].children.length==3){
+                  //document.getElementById("innertable").innerHTML+="<tr><td>"+res1[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='number' value='"+res1[i].children[2].innerHTML+"'> </td></tr>"
+                  hd2.push(res1[i].children[0].innerHTML)
+                  td2.push("<td> <input class='form-control' type='number' id='twoask"+i+"' value='"+res1[i].children[2].innerHTML+"'> </td>")
+                }else{
+                  //document.getElementById("innertable").innerHTML+="<tr><td>"+res1[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='number'> </td></tr>"
+                  hd2.push(res1[i].children[0].innerHTML)
+                  td2.push("<td> <input class='form-control' type='number' id='twoask"+i+"'> </td>")
+                }  
+              }
+              else{
+                if(res1[i].children.length==3){
+                  //document.getElementById("innerdata").innerHTML+="<tr><td>"+res1[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='text' value='"+res1[i].children[2].innerHTML+"'> </td></tr>"
+                  hd2.push(res1[i].children[0].innerHTML)
+                  td2.push("<td> <input class='form-control' type='text' id='twoask"+i+"' value='"+res1[i].children[2].innerHTML+"'> </td>")
+                }else{
+                  //document.getElementById("innerdata").innerHTML+="<tr><td>"+res1[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='text'> </td></tr>"
+                  hd2.push(res1[i].children[0].innerHTML)
+                  td2.push("<td> <input class='form-control' type='text' id='twoask"+i+"'> </td>")
+                }
+              }
+            }
+          var askttble2 = "<thead><tr>"
+          for (var hea of hd2){askttble2+="<th>"+hea+"</th>"}
+          askttble2+="</tr></thead>"
+          askttble2+="<tr>"
+          for (var bod of td2){askttble2+=bod}
+          askttble2+="<td><input class='btn btn-primary btn-rounded btn-fw' type='submit' onclick='postask1(`"+url+"`,`"+hd2+"`,`twoask`)' value='submit'> <input class='btn btn-primary btn-rounded btn-fw' type='reset' value='clear'> </td>"
+          askttble2+="</tr>"
+          document.getElementById("innertable").innerHTML=askttble2
+          //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'> <input class='btn btn-primary btn-rounded btn-fw' type='submit' value='submit'> <input class='btn btn-primary btn-rounded btn-fw' type='reset' value='clear'> </td></tr></form>"
+        }
+        else{
+          var in_url = res1[0].children[2].innerHTML;
+          if (in_url.search("http")<0){
+            var hd2 =[]
+            var td2 =[]
+              //document.getElementById("innertable").innerHTML="<thead><tr><th>Data</th><th>Value</th></tr></thead>"
+              for(i = 0;i<res1.length;i++){
+                if (res1[i].children[1].innerHTML=="name") {
+                  getroot(res1[i].children[2].innerHTML)
+                  hd2.push("Pointer")
+                  td2.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+res1[i].children[2].innerHTML+"`)'>"+res1[i].children[0].innerHTML+"</button>")
+                  //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button></td></tr>";
+                }
+                else {
+                  hd2.push(res1[i].children[0].innerHTML)
+                  if (res1[i].children.length != 2){
+                    td2.push(res1[i].children[2].innerHTML)
+                  }
+                  // td1.push(rres1[i].children[2].innerHTML)
+                  //document.getElementById("innertable").innerHTML+="<tr><td>"+rres1[i].children[0].innerHTML+" :</td> <td>"+rres1[i].children[2].innerHTML+"</td></tr>"
+                }
+              }
+              var tble2 = "<thead><tr>"
+              for (var he2 of hd2){tble2+="<th>"+he2+"</th>"}
+              tble2+="</tr></thead>"
+              tble2+="<tr>"
+              for (var bd2 of td2){tble2+="<td>"+bd2+"</td>"}
+              tble2+="</tr>"
+              document.getElementById("innertable").innerHTML=tble2
+          }
+          else{
+            if (res1[0].children[2].innerHTML.search("/2/Tell") > 0){
+              var temp_url = res1[0].children[2].innerHTML
+              var temp_name = res1[0].children[0].innerHTML
+              var url_fire = temp_url.replace(temp_name,temp_name.slice(2,temp_name.length))
+              var url_fire1 = temp_url.replace("2","1")
+              var rreq = new XMLHttpRequest();
+              rreq.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                  rres = rreq.responseXML;
+                  rres1 = rres.getElementsByTagName("Element");
+                  document.getElementById("innertable").innerHTML=""
+                  var hd1 =[]
+                  var td1 =[]
+                  //document.getElementById("innertable").innerHTML="<thead><tr><th>Data</th><th>Value</th></tr></thead>"
+                  for(i = 0;i<rres1.length;i++){
+                    if (rres1[i].children[1].innerHTML=="name") {
+                      getroot(rres1[i].children[2].innerHTML)
+                      hd1.push("Pointer")
+                      td1.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button>")
+                      //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button></td></tr>";
+                    }
+                    else {
+                      hd1.push(rres1[i].children[0].innerHTML)
+                      if (rres1[i].children.length != 2){
+                        td1.push(rres1[i].children[2].innerHTML)
+                      }
+                      // td1.push(rres1[i].children[2].innerHTML)
+                      //document.getElementById("innertable").innerHTML+="<tr><td>"+rres1[i].children[0].innerHTML+" :</td> <td>"+rres1[i].children[2].innerHTML+"</td></tr>"
+                    }
+                  }
+                  var tble1 = "<thead><tr>"
+                  for (var he1 of hd1){tble1+="<th>"+he1+"</th>"}
+                  tble1+="</tr></thead>"
+                  tble1+="<tr>"
+                  for (var bd1 of td1){tble1+="<td>"+bd1+"</td>"}
+                  tble1+="</tr>"
+                  document.getElementById("innertable").innerHTML=tble1
+                  // drawgraph()
+                }
+              }
+              rreq.open("GET", url_fire1,true);
+              rreq.overrideMimeType('text/xml');
+              rreq.send(); 
+            }
+            else{
+              var rreq = new XMLHttpRequest();
+              rreq.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                  rres = rreq.responseXML;
+                  rres1 = rres.getElementsByTagName("Element");
+                  document.getElementById("innertable").innerHTML=""
+                  var hd =[]
+                  var td =[]
+                  //document.getElementById("innertable").innerHTML="<thead><tr><th>Data</th><th>Value</th></tr></thead>"
+                  for(i = 0;i<rres1.length;i++){
+                    if (rres1[i].children[1].innerHTML=="name") {
+                      getroot(rres1[i].children[2].innerHTML)
+                      hd.push("Pointer")
+                      td.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button>")
+                      //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button></td></tr>";
+                    }
+                    else {
+                      hd.push(rres1[i].children[0].innerHTML)
+                      if (rres1[i].children.length!=2){
+                        td.push(rres1[i].children[2].innerHTML)
+                      }
+                      // td.push(rres1[i].children[2].innerHTML)
+                      //document.getElementById("innertable").innerHTML+="<tr><td>"+rres1[i].children[0].innerHTML+" :</td> <td>"+rres1[i].children[2].innerHTML+"</td></tr>"
+                    }
+                  }
+                  var tble = "<thead><tr>"
+                  for (var he of hd){tble+="<th>"+he+"</th>"}
+                  tble+="</tr></thead>"
+                  tble+="<tr>"
+                  for (var bd of td){tble+="<td>"+bd+"</td>"}
+                  tble+="</tr>"
+                  document.getElementById("innertable").innerHTML=tble
+                  // drawgraph()
+                }
+              }
+              rreq.open("GET", in_url,true);
+              rreq.overrideMimeType('text/xml');
+              rreq.send(); 
+            }
+          }
+        } 
+      }
+    }
+    req.open("GET", url,true);
+    req.overrideMimeType('text/xml');
+    req.send(); 
+  }
+
+  function postask1(url,data,field) {
+    data = data.split(",")
+    postdata=""
+    for(k = 0; k< data.length;k++){
+      var tmpdata = document.getElementById("oneask"+k+"")
+      if (typeof tmpdata !== undefined && tmpdata !== null ){
+        if ( data[k].toLowerCase().search("date") >= 0 ){
+          var tempp = document.getElementById(field+k).value
+          tempp = encodeURIComponent(tempp.split('-').reverse().join("/"))
+        }
+        else{
+          try {
+            var interdata = document.getElementsByName(field+k)[0].value;
+            var tempp = interdata
+          }
+          catch (error){
+            var tempp = document.getElementById(field+k).value
+            // console.log(error.name);
+          }
+        }
+        postdata+=""+data[k]+"="+tempp
+      }
+      else{
+        postdata+=""+data[k]+"="+" "
+      }
+      postdata+="&"
+    }
+    getarr = url.split("/");
+    postdata+="ask=true&Process="+getarr[7]+"&askProcessValue="+getarr[7]+"&pid="+getarr[8]+"&askPidValue="+getarr[8]+"&askActionValue="+getarr[9]+"&Action="+getarr[9]+"&askId="+getarr[10]+"&domain="+getarr[6]
+
+    var posthttp = new XMLHttpRequest();
+    posthttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200 ) {
+        const postres = posthttp.responseText
+        // console.log(postres)
+        document.getElementById("auxdata").innerHTML=""
+        if (postres.search("true")>0) {
+          console.log("ASK Success");
+          var confirmBox = $("#confirm");
+          confirmBox.find(".message").text("Submitted Successfully");
+          confirmBox.find(".yes").unbind().click(function() {
+          confirmBox.hide();
+          });
+          confirmBox.find(".yes").click();
+          confirmBox.show();
+          window.location.reload()        }
+      }
+      if(posthttp.status == 500) {
+          console.log("ASK Failed");
+          var confirmBox = $("#confirm");
+          confirmBox.find(".message").text("Submit Failed");
+          confirmBox.find(".yes").unbind().click(function() {
+          confirmBox.hide();
+          });
+          confirmBox.find(".yes").click();
+          confirmBox.show();
+      }
+    }
+    const posturl= "http://"+ip+":"+port+"/Axon/action/submitPayLoadService.jsp?"+postdata
+
+    posthttp.open("POST", posturl);
+    posthttp.send();
+
+  }
+
+  function getname(elt,tagele) {
+    var que = document.getElementById(tagele).value
+    if(typeof que !== undefined && que !== null){
+      var namehttp = new XMLHttpRequest();
+      namehttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200 ) {
+          const nameres = namehttp.responseXML
+          var keyname = nameres.getElementsByTagName("key")[0].innerHTML;
+          var valuename = nameres.getElementsByTagName("value")[0].innerHTML;
+          // console.log(keyname, valuename);
+          document.getElementById(tagele).value = valuename;
+          document.getElementById("auxdata").innerHTML+="<input type='hidden' name='"+tagele+"' value='"+keyname+"'>"
+        }
+      }
+      const nameurl= "http://"+ip+":"+port+"/Axon/getNameData.jsp?elt="+elt+"&q="+que
+
+      namehttp.open("GET", nameurl);
+      namehttp.overrideMimeType('text/xml');
+      namehttp.send();
+    }
+
+  }
+
+  function getContents3(name,url){
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        Dx = xhr.responseXML;
+        xxr = Dx.getElementsByTagName("Name");
+        document.getElementById("innerdata1").innerHTML="<h3>"+name+"</h3><br>";
+        inner_url="";
+        xr=[];
+        document.getElementById("spldata").innerHTML=""
+        for (i = 0; i< xxr.length; i++) {
+          inner_url=xxr[i].children[0].innerHTML;
+          xr[i] = new XMLHttpRequest();
+          xr[i].onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              Dxx = this.responseXML;
+              xxxr = Dxx.getElementsByTagName("Element");
+              var check=""+inner_url.search("Ask")
+              if (check >0) {
+                console.log("Inside Ask");
+                document.getElementById("innerdata").innerHTML=""
+                document.getElementById("innertable").innerHTML=""
+                document.getElementById("spldata").innerHTML=""
+                hea=[]
+                boa=[]
+                for (i = 0; i< xxxr.length;i++){
+                  if(xxxr[i].children[1].innerHTML=="date"){
+                    if(xxxr[i].children.length==3){
+                      //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td> <td><input class='form-control' type='date' value='"+xxxr[i].children[2].innerHTML+"'> </td></tr>"
+                      hea.push(xxxr[i].children[0].innerHTML)
+                      boa.push("<td><input class='form-control' type='date' id='oneask"+i+"' value='"+xxxr[i].children[2].innerHTML+"'> </td>")
+                    }else{
+                      //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td> <td><input class='form-control' type='date'> </td></tr>"
+                      hea.push(xxxr[i].children[0].innerHTML)
+                      boa.push("<td><input class='form-control' type='date' id='oneask"+i+"'> </td>")
+                    }
+                  }
+                  else if(xxxr[i].children[1].innerHTML=="number"){
+                    if(xxxr[i].children.length==3){
+                      //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='number' value='"+xxxr[i].children[2].innerHTML+"'> </td></tr>"
+                      hea.push(xxxr[i].children[0].innerHTML)
+                      boa.push("<td><input class='form-control' type='number' id='oneask"+i+"' value='"+xxxr[i].children[2].innerHTML+"'> </td>")
+                    }else{
+                      //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='number'> </td></tr>"
+                      hea.push(xxxr[i].children[0].innerHTML)
+                      boa.push("<td><input class='form-control' type='number' id='oneask"+i+"'> </td>")
+                    }  
+                  }
+                  else if(xxxr[i].children[1].innerHTML=="name"){
+                      //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='text'> </td></tr>"
+                      hea.push(xxxr[i].children[0].innerHTML)
+                      boa.push("<td> <input class='form-control' type='text' id='oneask"+i+"' onkeyup='getname(`"+xxxr[i].children[0].innerHTML+"`,`oneask"+i+"`)'> </td>")
+                  }
+                  else{
+                    if(xxxr[i].children.length==3){
+                      //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='text' value='"+xxxr[i].children[2].innerHTML+"'> </td></tr>"
+                      hea.push(xxxr[i].children[0].innerHTML)
+                      boa.push("<td> <input class='form-control' type='text' id='oneask"+i+"' value='"+xxxr[i].children[2].innerHTML+"'> </td>")
+                    }else{
+                      //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='text'> </td></tr>"
+                      hea.push(xxxr[i].children[0].innerHTML)
+                      boa.push("<td> <input class='form-control' type='text' id='oneask"+i+"'> </td>")
+                    }
+                  }
+                }
+                var askttble = "<thead><tr>"
+                for (var he of hea){askttble+="<th>"+he+"</th>"}
+                askttble+="</tr></thead>"
+                askttble+="<tr>"
+                for (var bod of boa){askttble+=bod}
+                askttble+="<td><input class='btn btn-primary btn-rounded btn-fw' type='submit' onclick='postask1(`"+inner_url+"`,`"+hea+"`,`oneask`)' value='submit'> </td>"
+                askttble+="</tr>"
+                document.getElementById("innerdata").innerHTML=askttble
+
+              }
+              else {
+                console.log("Inside Tell");
+                document.getElementById("innerdata").innerHTML=""
+                document.getElementById("innertable").innerHTML=""
+                // document.getElementById("innerdata").innerHTML="<thead><tr><th>Data</th><th>Value</th></tr></thead>"
+                if(xxr.length>1){
+                  for (i = 0; i< xxxr.length;i++){
+                    if (xxxr[i].children[1].innerHTML=="name") {
+                      document.getElementById("spldata").innerHTML+="<div class='grid-item'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+xxxr[i].children[2].innerHTML+"`)'>"+xxxr[i].children[0].innerHTML+"</button></div>";
+                    }
+                  }
+                }
+                else {
+                  document.getElementById("spldata").innerHTML=""
+                  headdata=[]
+                  bodydata=[]
+                  for (i = 0; i< xxxr.length;i++){
+                    if (xxxr[i].children[1].innerHTML=="name") {
+                      getroot(xxxr[i].children[2].innerHTML)
+                      headdata.push("Pointer")
+                      bodydata.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+xxxr[i].children[2].innerHTML+"`)'>"+xxxr[i].children[0].innerHTML+"</button>")
+                      //document.getElementById("innerdata").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+xxxr[i].children[2].innerHTML+"`)'>"+xxxr[i].children[0].innerHTML+"</button></td></tr>";
+                    }
+                    else {
+                      headdata.push(xxxr[i].children[0].innerHTML)
+                      if(xxxr[i].children.length!=2){
+                        bodydata.push(xxxr[i].children[2].innerHTML)
+                      }
+                      //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+"</td><td>"+xxxr[i].children[2].innerHTML+"</td></tr>";
+                    }
+                  }
+                  var ttble = "<thead><tr>"
+                  for (var hea of headdata){ttble+="<th>"+hea+"</th>"}
+                  ttble+="</tr></thead>"
+                  ttble+="<tr>"
+                  for (var bod of bodydata){ttble+="<td>"+bod+"</td>"}
+                  ttble+="</tr>"
+                  document.getElementById("innerdata").innerHTML=ttble
+                  // drawgraph()
+                  document.getElementById("demo").innerHTML="<button class='btn btn-primary btn-rounded btn-fw' onclick='drawgraph()'>Show Relation</button>";
+                }
+              }
+            }
+          }
+          xr[i].open("GET", inner_url,true);
+          xr[i].overrideMimeType('text/xml');
+          xr[i].send();
+        }
+      }
+    }
+    xhr.open("GET", url,true);
+    xhr.overrideMimeType('text/xml');
+    xhr.send(); 
+  }
+
+  function getContent2(url,tag,pname){
+      var xhr =  new XMLHttpRequest();
+      graph.splice(0,graph.length)
+      getroot(url)
+      xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          Doc = xhr.responseXML;
+          xxx = Doc.getElementsByTagName(tag);
+          obj_arr=[];
+          for (i = 0; i< xxx.length; i++) {
+            val_name=xxx[i].children[0].innerHTML
+            val_uri=xxx[i].children[1].innerHTML
+            obj={text:{name: val_name},link:{href:"javascript:getContents3(`"+val_name+"`,`"+val_uri+"`)"}}
+            obj_arr.push(obj)
+          }
+            simple_chart_config3 = {
+                chart: {
+                  container: "#tree-simple3",
+                  rootOrientation:  'NORTH', // NORTH || EAST || WEST || SOUTH
+                  siblingSeparation:   30,
+                  subTeeSeparation:    30,
+                  animateOnInit: true,
+                  connectors:{
+                    style: {
+                      'stroke':'#ff6600',
+                      'arrow-end':'oval-wide-long'
+                    }
+                  },
+                  node: {
+                      collapsable: true,
+                      HTMLclass: 'nodeExample1'
+                  },
+                  animation: {
+                      nodeAnimation: "easeOutBounce",
+                      nodeSpeed: 700,
+                      connectorsAnimation: "bounce",
+                      connectorsSpeed: 700
+                  }
+                },
+                nodeStructure: {
+                  text: { name: pname },
+                    children: obj_arr
+                  }
+            }
+            var my_chart3 = new Treant(simple_chart_config3);
+        }
+      }
+      xhr.open("GET", url,true);
+      xhr.overrideMimeType('text/xml');
+      xhr.send();
+  }
+  
+  
+    function getContent(url,tag,pname){
+      var http = new XMLHttpRequest();
+      http.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          con_arr=[];
+          xDoc = http.responseXML;
+          xx = xDoc.getElementsByTagName(tag);
+          for (i = 0; i< xx.length; i++) {
+            tt=xx[i].children[0].innerHTML
+            mytot={ text: {name: tt},link:{href: "javascript:getContent2(`"+xx[i].children[1].innerHTML+"`,'Action',`"+xx[i].children[0].innerHTML+"`)"}}
+            con_arr.push(mytot)
+          }
+          simple_chart_config2 = {
+            chart: {
+              container: "#tree-simple2",
+              rootOrientation:  'NORTH', // NORTH || EAST || WEST || SOUTH
+              siblingSeparation:   30,
+              subTeeSeparation:    30,
+              animateOnInit: true,
+              connectors:{
+                style: {
+                  'stroke':'#ff6600',
+                  'arrow-end':'oval-wide-long'
+                }
+              },
+              node: {
+                 collapsable: true,
+                  HTMLclass: 'nodeExample1'
+              },
+              animation: {
+                nodeAnimation: "easeOutBounce",
+                nodeSpeed: 700,
+                connectorsAnimation: "bounce",
+                connectorsSpeed: 700
+              }
+            },
+            nodeStructure: {
+              text: { name: pname },
+                children: con_arr
+            }
+          }
+        var my_chart2 = new Treant(simple_chart_config2);
+        }
+      }
+      http.open("GET", url,true);
+      http.overrideMimeType('text/xml');
+      http.send();
+    }
+
+    
+  function fun(x){
+    simple_chart_config = {
+          chart: {
+            container: "#tree-simple",
+            rootOrientation:  'NORTH', // NORTH || EAST || WEST || SOUTH
+              siblingSeparation:   30,
+              subTeeSeparation:    30,
+              animateOnInit: true,
+              connectors:{
+                style: {
+                  'stroke':'#ff6600',
+                  'arrow-end':'oval-wide-long'
+                }
+              },
+              node: {
+                  collapsable: true,
+                  HTMLclass: 'nodeExample1',
+              },
+              animation: {
+                  nodeAnimation: "easeOutBounce",
+                  nodeSpeed: 700,
+                  connectorsAnimation: "bounce",
+                  connectorsSpeed: 700
+              }
+          },
+          nodeStructure: {
+            text: { name: ""+ip+":"+port },
+              children: x
+            }
+        }
+        var my_chart = new Treant(simple_chart_config);
+  }
+
+  function load(){
+    ip = window.sessionStorage.getItem("ip");
+    port = window.sessionStorage.getItem("port");
+    console.log(ip,port)
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        json_arr = [];
+        xmlDoc = xmlhttp.responseXML;
+        x = xmlDoc.getElementsByTagName("Process");
+        for (i = 0; i< x.length; i++) {
+            tot={ text: {name: x[i].children[0].innerHTML},link:{href: "javascript:getContent(`"+x[i].children[1].innerHTML+"`,'Pid',`"+x[i].children[0].innerHTML+"`)"}}
+            json_arr.push(tot);
+        }
+        fun(json_arr);
+      }
+    }
+    xmlhttp.open("GET", "http://"+ip+":"+port+"/Axon/MasterKube/general/masterkube",true);
+    xmlhttp.overrideMimeType('text/xml');
+    xmlhttp.send();	
+  }
+
+  function cls(){
+    document.getElementById("tree-simple2").innerHTML=""
+    document.getElementById("tree-simple3").innerHTML=""
+    document.getElementById("innerdata1").innerHTML=""
+    document.getElementById("innerdata").innerHTML=""
+    document.getElementById("innertable").innerHTML=""
+    document.getElementById("mesh").innerHTML=""
+    document.getElementById("spldata").innerHTML=""
+    document.getElementById("demo").innerHTML=""
+    
+  }
+
+  function clstable(){
+    document.getElementById("innerdata").innerHTML=""
+    document.getElementById("innertable").innerHTML=""
+  }
+
+ </script>
+
+
+</head>
+<body onload="load()" >
+  <div id="video_wrapper">
+    <div id="wrapper">
+     <div class="container-scroller">
+          <!-- partial:partials/_navbar.html -->
+          <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+              <a class="navbar-brand brand-logo mr-5" href="dashboard.html"><img src="./images/Logo.png" class="mr-2" alt="logo"/></a>
+            </div>
+            <div class="navbar-menu-wrapper d-flex  align-items-center justify-content-end">
+              <a onclick="window.open('search.html','_blank')">
+                <i class="text-primary" style="padding-left: 5px;"></i>
+                Search
+              </a>
+              <a onclick="window.open('history.html','_blank')">
+                <i class="text-primary" style="padding-left: 5px; margin-left: 10px;"></i>
+                History
+              </a>
+            </div>
+          </nav>
+        <!-- partial -->
+        <!-- <div class="container-fluid page-body-wrapper"> -->
+          <!-- partial:partials/_sidebar.html -->
+        
+          <!-- partial -->
+          <!-- <div class="main-panel">           -->
+            <ul id="mylist"></ul>
+            <div id="demo"></div>
+            <button class="btn btn-primary btn-rounded btn-fw" onclick="cls()"  style="margin-top: 10px; align-items: center;" >Home</button>
+            <!-- <button onclick="showgraph()">Show relation</button> -->
+            <div id="tree-simple" style="width:100%; height: 100%;"> </div>
+            <div id="tree-simple2" style="width:100%; height: 100%;"> </div>
+            <div id="tree-simple3" style="width:100%; height: 100%;"> </div>
+            <div id="innerdata1" style="margin-top: 20px; text-align: center; color: #000000;"></div>
+            <div style="float: right" id="mesh"></div>
+            <div class="table grid-container" id="spldata"  style="margin-top: 20px;"></div>
+            <table class="table table-hover" style="width: auto;" id="innerdata"  style="margin-top: 20px; color: #000000;"></table>
+            <table class="table table-hover" style="width: auto;" id="innertable"  style="margin-top: 20px; color: #000000;"></table>
+            <div id="auxdata" ></div>
+            <div id="confirm">
+              <div class="message" ></div><br>
+              <button class="yes">Close</button>
+            </div>
+     </div>
+  <!-- container-scroller -->
+
+  <!-- plugins:js -->
+  <script src="vendors/js/vendor.bundle.base.js"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page -->
+  <script src="vendors/chart.js/Chart.min.js"></script>
+  <script src="vendors/datatables.net/jquery.dataTables.js"></script>
+  <script src="vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
+  <script src="js/dataTables.select.min.js"></script>
+
+  <!-- End plugin js for this page -->
+  <!-- inject:js -->
+  <script src="js/off-canvas.js"></script>
+  <script src="js/hoverable-collapse.js"></script>
+  <script src="js/template.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/todolist.js"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+  <script src="js/dashboard.js"></script>
+  <script src="js/Chart.roundedBarCharts.js"></script>
+  <!-- End custom js for this page-->
+</body>
+
+</html>
+
