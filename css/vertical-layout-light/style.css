@@ -11082,19 +11082,19 @@ fieldset:disabled .wizard > .actions a,
 
 .btn-primary, .wizard > .actions a {
   color: #fff;
-  background-color: #1848a0;
+  background-color: #0e2a5d;
   border-color: #000000;
 }
 
 .btn-primary:hover, .wizard > .actions a:hover {
   color: #fff;
-  background-color: #1848a0;
+  background-color: #0e2a5d;
   border-color: #000000;
 }
 
 .btn-primary:focus, .wizard > .actions a:focus, .btn-primary.focus, .wizard > .actions a.focus {
   color: #fff;
-  background-color: #1848a0;
+  background-color: #0e2a5d;
   border-color: #000000;
 }
 
@@ -24704,7 +24704,7 @@ dl li {
 .nav-tabs.nav-tabs-vertical-custom .nav-link {
   background: transparent;
   border-color: rgba(255, 255, 255, 0.2);
-  color: #1c1b41;
+  color: #ff6600;
   font-weight: 600;
   padding: 1.75rem;
 }
