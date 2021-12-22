@@ -406,6 +406,7 @@
                         obj_arr.push(parentnode)
                         sub1=[];
                         sub2=[];
+                        sub3=[];
                         for (i = 0; i< xxx.length; i++) {
                             val_uri=xxx[i].children[0].innerHTML
                             inside_array = val_uri.split("/")
@@ -417,10 +418,13 @@
                             ininner = inside_array[8].split("-")
 
                             if(inside_array[8].search("User")>=0){
-                                for(j=2;j<obj_arr.length;j++){
-                                    if(obj_arr[j].text.name == "User"){
-                                        inside_array[8] = {parent: obj_arr[j],text:{name:inside_array[8]}}
-                                        obj_arr.push(inside_array[8])
+                                if(!sub3.includes(inside_array[8])){
+                                    sub3.push(inside_array[8])
+                                    for(j=2;j<obj_arr.length;j++){
+                                        if(obj_arr[j].text.name == "User"){
+                                            inside_array[8] = {parent: obj_arr[j],text:{name:inside_array[8]}}
+                                            obj_arr.push(inside_array[8])
+                                        }
                                     }
                                 }
                             }
