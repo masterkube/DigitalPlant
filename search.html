@@ -1,0 +1,694 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="vendors/feather/feather.css">
+        <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
+        <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+        <!-- endinject -->
+        <!-- Plugin css for this page -->
+        <link rel="stylesheet" href="vendors/datatables.net-bs4/dataTables.bootstrap4.css">
+        <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
+        <link rel="stylesheet" type="text/css" href="js/select.dataTables.min.css">
+        <!-- End plugin css for this page -->
+        <!-- inject:css -->
+        <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+        <link rel="stylesheet" href="css/style.css">
+        <title> Axon Search </title>
+        <script src="js/raphael.js"></script>
+        <script src="js/treant.js"></script>
+        <link rel="stylesheet" href="css/style.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="shortcut icon" href="images/Shortcut Logo.png" />
+        <style>
+            .link {
+          stroke: #ff6600;
+          opacity: 100;
+          stroke-width: 5px;
+        }
+        .node circle {
+          stroke: rgb(255, 255, 255);
+          opacity: 100;
+          stroke-width: 3px;
+        }
+        text {
+          font: 25px serif;
+          opacity: 100;
+          pointer-events:none;
+        }
+        .grid-container {
+          display: grid;
+          grid-template-columns: auto auto;
+        }
+        .grid-item {
+          background-color: inherit;
+          border: 1px;
+          padding:inherit;
+          text-align: center;
+          width: auto;
+        }
+        #confirm {
+          display: none;
+          background-color: #ff6600;
+          color: #000000;
+          border: 4px solid rgba(255, 255, 255, 0.871);
+          position: fixed;
+          width: 300px;
+          height: 100px;
+          left: 40%;
+          top: 40%;
+          box-sizing: border-box;
+          text-align: center;
+        }
+        #confirm button {
+          background-color: #0e2a5d;
+          display: inline-block;
+          border-radius: 12px;
+          border: 4px solid rgb(255, 255, 255);
+          padding: 5px;
+          text-align: center;
+          width: 60px;
+          cursor: pointer;
+          color: #ffff;
+        }
+        #confirm .message {
+          text-align: left;
+          background-color: #ff6600;
+          color: black;
+          text-align: center;
+          margin-top: 5px;
+        }
+      </style>
+
+        <script>
+            function postask1(url,data,field) {
+                data = data.split(",")
+                postdata=""
+                for(k = 0; k< data.length;k++){
+                var tmpdata = document.getElementById("oneask"+k+"")
+                if (typeof tmpdata !== undefined && tmpdata !== null ){
+                    if ( data[k].toLowerCase().search("date") >= 0 ){
+                    var tempp = document.getElementById(field+k).value
+                    tempp = encodeURIComponent(tempp.split('-').reverse().join("/"))
+                    }
+                    else{
+                    try {
+                        var interdata = document.getElementsByName(field+k)[0].value;
+                        var tempp = interdata
+                    }
+                    catch (error){
+                        var tempp = document.getElementById(field+k).value
+                        // console.log(error.name);
+                    }
+                    }
+                    postdata+=""+data[k]+"="+tempp
+                }
+                else{
+                    postdata+=""+data[k]+"="+" "
+                }
+                postdata+="&"
+                }
+                getarr = url.split("/");
+                postdata+="ask=true&Process="+getarr[7]+"&askProcessValue="+getarr[7]+"&pid="+getarr[8]+"&askPidValue="+getarr[8]+"&askActionValue="+getarr[9]+"&Action="+getarr[9]+"&askId="+getarr[10]+"&domain="+getarr[6]
+
+                var posthttp = new XMLHttpRequest();
+                posthttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200 ) {
+                    const postres = posthttp.responseText
+                    // console.log(postres)
+                    document.getElementById("auxdata").innerHTML=""
+                    if (postres.search("true")>0) {
+                    var confirmBox = $("#confirm");
+                    confirmBox.find(".message").text("Submitted Successfully");
+                    confirmBox.find(".yes").unbind().click(function() {
+                    confirmBox.hide();
+                    });
+                    confirmBox.find(".yes").click();
+                    confirmBox.show();
+                    window.location.reload()        }
+                }
+                if(posthttp.status == 500) {
+                    var confirmBox = $("#confirm");
+                    confirmBox.find(".message").text("Submit Failed");
+                    confirmBox.find(".yes").unbind().click(function() {
+                    confirmBox.hide();
+                    });
+                    confirmBox.find(".yes").click();
+                    confirmBox.show();
+                }
+                }
+                const posturl= "http://"+ip+":"+port+"/Axon/action/submitPayLoadService.jsp?"+postdata
+
+                posthttp.open("POST", posturl);
+                posthttp.send();
+
+            }
+
+            function getname(elt,tagele) {
+                var que = document.getElementById(tagele).value
+                if(typeof que !== undefined && que !== null){
+                var namehttp = new XMLHttpRequest();
+                namehttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200 ) {
+                    const nameres = namehttp.responseXML
+                    var keyname = nameres.getElementsByTagName("key")[0].innerHTML;
+                    var valuename = nameres.getElementsByTagName("value")[0].innerHTML;
+                    // console.log(keyname, valuename);
+                    document.getElementById(tagele).value = valuename;
+                    document.getElementById("auxdata").innerHTML+="<input type='hidden' name='"+tagele+"' value='"+keyname+"'>"
+                    }
+                }
+                const nameurl= "http://"+ip+":"+port+"/Axon/getNameData.jsp?elt="+elt+"&q="+que
+
+                namehttp.open("GET", nameurl);
+                namehttp.overrideMimeType('text/xml');
+                namehttp.send();
+                }
+            }
+
+
+            function getContents3(url){
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    // document.getElementById("innerdata1").innerHTML="<h3>"+name+"</h3><br>";
+                    document.getElementById("spldata").innerHTML=""
+                        Dxx = this.responseXML;
+                        xxxr = Dxx.getElementsByTagName("Element");
+                        var check=""+url.search("Ask")
+                        if (check >0) {
+                            console.log("Inside Ask");
+                            document.getElementById("innerdata").innerHTML=""
+                            document.getElementById("innertable").innerHTML=""
+                            document.getElementById("spldata").innerHTML=""
+                            hea=[]
+                            boa=[]
+                            for (i = 0; i< xxxr.length;i++){
+                            if(xxxr[i].children[1].innerHTML=="date"){
+                                if(xxxr[i].children.length==3){
+                                //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td> <td><input class='form-control' type='date' value='"+xxxr[i].children[2].innerHTML+"'> </td></tr>"
+                                hea.push(xxxr[i].children[0].innerHTML)
+                                boa.push("<td><input class='form-control' type='date' id='oneask"+i+"' value='"+xxxr[i].children[2].innerHTML+"'> </td>")
+                                }else{
+                                //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td> <td><input class='form-control' type='date'> </td></tr>"
+                                hea.push(xxxr[i].children[0].innerHTML)
+                                boa.push("<td><input class='form-control' type='date' id='oneask"+i+"'> </td>")
+                                }
+                            }
+                            else if(xxxr[i].children[1].innerHTML=="number"){
+                                if(xxxr[i].children.length==3){
+                                //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='number' value='"+xxxr[i].children[2].innerHTML+"'> </td></tr>"
+                                hea.push(xxxr[i].children[0].innerHTML)
+                                boa.push("<td><input class='form-control' type='number' id='oneask"+i+"' value='"+xxxr[i].children[2].innerHTML+"'> </td>")
+                                }else{
+                                //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='number'> </td></tr>"
+                                hea.push(xxxr[i].children[0].innerHTML)
+                                boa.push("<td><input class='form-control' type='number' id='oneask"+i+"'> </td>")
+                                }
+                            }
+                            else if(xxxr[i].children[1].innerHTML=="name"){
+                                //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='text'> </td></tr>"
+                                hea.push(xxxr[i].children[0].innerHTML)
+                                boa.push("<td> <input class='form-control' type='text' id='oneask"+i+"' onkeyup='getname(`"+xxxr[i].children[0].innerHTML+"`,`oneask"+i+"`)'> </td>")
+                            }
+                            else{
+                                if(xxxr[i].children.length==3){
+                                //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='text' value='"+xxxr[i].children[2].innerHTML+"'> </td></tr>"
+                                hea.push(xxxr[i].children[0].innerHTML)
+                                boa.push("<td> <input class='form-control' type='text' id='oneask"+i+"' value='"+xxxr[i].children[2].innerHTML+"'> </td>")
+                                }else{
+                                //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='text'> </td></tr>"
+                                hea.push(xxxr[i].children[0].innerHTML)
+                                boa.push("<td> <input class='form-control' type='text' id='oneask"+i+"'> </td>")
+                                }
+                            }
+                            }
+                            var askttble = "<thead><tr>"
+                            for (var he of hea){askttble+="<th>"+he+"</th>"}
+                            askttble+="</tr></thead>"
+                            askttble+="<tr>"
+                            for (var bod of boa){askttble+=bod}
+                            askttble+="<td><input class='btn btn-primary btn-rounded btn-fw' type='submit' onclick='postask1(`"+url+"`,`"+hea+"`,`oneask`)' value='submit'> </td>"
+                            askttble+="</tr>"
+                            document.getElementById("innerdata").innerHTML=askttble
+
+                        }
+                        else {
+                            var in_url = xxxr[0].children[2].innerHTML;
+                            if (in_url.search("http")<0){
+                                var hd2 =[]
+                                var td2 =[]
+                                //document.getElementById("innertable").innerHTML="<thead><tr><th>Data</th><th>Value</th></tr></thead>"
+                                for(i = 0;i<xxxr.length;i++){
+                                    if (xxxr[i].children[1].innerHTML=="name") {
+                                    hd2.push("Pointer")
+                                    td2.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContents3(`"+xxxr[i].children[2].innerHTML+"`)'>"+xxxr[i].children[0].innerHTML+"</button>")
+                                    //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rxxxr[i].children[2].innerHTML+"`)'>"+rxxxr[i].children[0].innerHTML+"</button></td></tr>";
+                                    }
+                                    else {
+                                    hd2.push(xxxr[i].children[0].innerHTML)
+                                    if (xxxr[i].children.length != 2){
+                                        td2.push(xxxr[i].children[2].innerHTML)
+                                    }
+                                    // td1.push(rxxxr[i].children[2].innerHTML)
+                                    //document.getElementById("innertable").innerHTML+="<tr><td>"+rxxxr[i].children[0].innerHTML+" :</td> <td>"+rxxxr[i].children[2].innerHTML+"</td></tr>"
+                                    }
+                                }
+                                document.getElementById("innerdata").innerHTML=""
+                                var tble2 = "<thead><tr>"
+                                for (var he2 of hd2){tble2+="<th>"+he2+"</th>"}
+                                tble2+="</tr></thead>"
+                                tble2+="<tr>"
+                                for (var bd2 of td2){tble2+="<td>"+bd2+"</td>"}
+                                tble2+="</tr>"
+                                document.getElementById("innertable").innerHTML=tble2
+                            }
+                            else{
+                                if (xxxr[0].children[2].innerHTML.search("/2/Tell") > 0){
+                                var temp_url = xxxr[0].children[2].innerHTML
+                                // var temp_name = xxxr[0].children[0].innerHTML
+                                // var url_fire = temp_url.replace(temp_name,temp_name.slice(2,temp_name.length))
+                                // var url_fire1 = temp_url.replace("2","1")
+                                var url_fire1 = temp_url.replace("/2/Tell", "/1/Tell")
+                                var rreq = new XMLHttpRequest();
+                                rreq.onreadystatechange = function() {
+                                    if (this.readyState == 4 && this.status == 200) {
+                                    rres = rreq.responseXML;
+                                    rxxxr = rres.getElementsByTagName("Element");
+                                    document.getElementById("innertable").innerHTML=""
+                                    var hd1 =[]
+                                    var td1 =[]
+                                    //document.getElementById("innertable").innerHTML="<thead><tr><th>Data</th><th>Value</th></tr></thead>"
+                                    for(i = 0;i<rxxxr.length;i++){
+                                        if (rxxxr[i].children[1].innerHTML=="name") {
+                                        hd1.push("Pointer")
+                                        td1.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContents3(`"+rxxxr[i].children[2].innerHTML+"`)'>"+rxxxr[i].children[0].innerHTML+"</button>")
+                                        //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rxxxr[i].children[2].innerHTML+"`)'>"+rxxxr[i].children[0].innerHTML+"</button></td></tr>";
+                                        }
+                                        else {
+                                        hd1.push(rxxxr[i].children[0].innerHTML)
+                                        if (rxxxr[i].children.length != 2){
+                                            td1.push(rxxxr[i].children[2].innerHTML)
+                                        }
+                                        // td1.push(rxxxr[i].children[2].innerHTML)
+                                        //document.getElementById("innertable").innerHTML+="<tr><td>"+rxxxr[i].children[0].innerHTML+" :</td> <td>"+rxxxr[i].children[2].innerHTML+"</td></tr>"
+                                        }
+                                    }
+                                    document.getElementById("innerdata").innerHTML=""
+                                    var tble1 = "<thead><tr>"
+                                    for (var he1 of hd1){tble1+="<th>"+he1+"</th>"}
+                                    tble1+="</tr></thead>"
+                                    tble1+="<tr>"
+                                    for (var bd1 of td1){tble1+="<td>"+bd1+"</td>"}
+                                    tble1+="</tr>"
+                                    document.getElementById("innertable").innerHTML=tble1
+                                    // drawgraph()
+                                    }
+                                }
+                                rreq.open("GET", url_fire1,true);
+                                rreq.overrideMimeType('text/xml');
+                                rreq.send(); 
+                                }
+                                else{
+                                var rreq = new XMLHttpRequest();
+                                rreq.onreadystatechange = function() {
+                                    if (this.readyState == 4 && this.status == 200) {
+                                    rres = rreq.responseXML;
+                                    rxxxr = rres.getElementsByTagName("Element");
+                                    document.getElementById("innertable").innerHTML=""
+                                    var hd =[]
+                                    var td =[]
+                                    //document.getElementById("innertable").innerHTML="<thead><tr><th>Data</th><th>Value</th></tr></thead>"
+                                    for(i = 0;i<rxxxr.length;i++){
+                                        if (rxxxr[i].children[1].innerHTML=="name") {
+                                        hd.push("Pointer")
+                                        td.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContents3(`"+rxxxr[i].children[2].innerHTML+"`)'>"+rxxxr[i].children[0].innerHTML+"</button>")
+                                        //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rxxxr[i].children[2].innerHTML+"`)'>"+rxxxr[i].children[0].innerHTML+"</button></td></tr>";
+                                        }
+                                        else {
+                                        hd.push(rxxxr[i].children[0].innerHTML)
+                                        if (rxxxr[i].children.length!=2){
+                                            td.push(rxxxr[i].children[2].innerHTML)
+                                        }
+                                        // td.push(rxxxr[i].children[2].innerHTML)
+                                        //document.getElementById("innertable").innerHTML+="<tr><td>"+rxxxr[i].children[0].innerHTML+" :</td> <td>"+rxxxr[i].children[2].innerHTML+"</td></tr>"
+                                        }
+                                    }
+                                    document.getElementById("innerdata").innerHTML=""
+                                    var tble = "<thead><tr>"
+                                    for (var he of hd){tble+="<th>"+he+"</th>"}
+                                    tble+="</tr></thead>"
+                                    tble+="<tr>"
+                                    for (var bd of td){tble+="<td>"+bd+"</td>"}
+                                    tble+="</tr>"
+                                    document.getElementById("innertable").innerHTML=tble
+                                    // drawgraph()
+                                    }
+                                }
+                                rreq.open("GET", in_url,true);
+                                rreq.overrideMimeType('text/xml');
+                                rreq.send(); 
+                                }
+                            }
+                        }
+                    }
+                }
+                xhr.open("GET", url,true);
+                xhr.overrideMimeType('text/xml');
+                xhr.send();
+            }
+
+
+            function secondcall(url){
+                var xhr =  new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                    Doc = xhr.responseXML;
+                    xxx = Doc.getElementsByTagName("Name");
+                    if (xxx.length===0){
+                        var confirmBox = $("#confirm");
+                        confirmBox.find(".message").text("No Search Result Found");
+                        confirmBox.find(".yes").unbind().click(function() {
+                        confirmBox.hide();
+                        });
+                        confirmBox.find(".yes").click();
+                        confirmBox.show();
+                    }
+                    else{
+                        obj_arr=[];
+                        chart={
+                                container: "#tree-simple3",
+                                rootOrientation:  'NORTH', // NORTH || EAST || WEST || SOUTH
+                                siblingSeparation:   30,
+                                subTeeSeparation:    30,
+                                animateOnInit: true,
+                                connectors:{
+                                    style: {
+                                    'stroke':'#ff6600',
+                                    'arrow-end':'oval-wide-long'
+                                    }
+                                },
+                                node: {
+                                    collapsable: true,
+                                    HTMLclass: 'nodeExample1'
+                                },
+                                animation: {
+                                    nodeAnimation: "easeOutBounce",
+                                    nodeSpeed: 700,
+                                    connectorsAnimation: "bounce",
+                                    connectorsSpeed: 700
+                                }
+                            };
+                        obj_arr.push(chart)
+                        parentnode = {text: { name: ""+ip+":"+port }}
+                        obj_arr.push(parentnode)
+                        sub1=[];
+                        sub2=[];
+                        sub3=[];
+                        for (i = 0; i< xxx.length; i++) {
+                            val_uri=xxx[i].children[0].innerHTML
+                            inside_array = val_uri.split("/")
+                            if (!sub1.includes(inside_array[7])){
+                                sub1.push(inside_array[7])
+                                inside_array[7]={parent:parentnode,text:{name: inside_array[7]}}
+                                obj_arr.push(inside_array[7])
+                            }
+                            ininner = inside_array[8].split("-")
+
+                            if(inside_array[8].search("User")>=0){
+                                if(!sub3.includes(inside_array[8])){
+                                    sub3.push(inside_array[8])
+                                    for(j=2;j<obj_arr.length;j++){
+                                        if(obj_arr[j].text.name == "User"){
+                                            inside_array[8] = {parent: obj_arr[j],text:{name:inside_array[8]}}
+                                            obj_arr.push(inside_array[8])
+                                        }
+                                    }
+                                }
+                            }
+                            else{
+                                if (sub1.includes(ininner[0])){
+                                    if (!sub2.includes(inside_array[8])){
+                                        sub2.push(inside_array[8])
+                                        for(j=2;j<obj_arr.length;j++){
+                                            if(obj_arr[j].text.name == ininner[0]){
+                                                inside_array[8]={parent:obj_arr[j],text:{name: inside_array[8]}}
+                                                obj_arr.push(inside_array[8])
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        for(i=0;i<xxx.length;i++){
+                            v_uri=xxx[i].children[0].innerHTML
+                            ssplit = v_uri.split("/")
+                            domi=ssplit[8].split("-")
+                                for(j=2;j<obj_arr.length;j++){
+                                    if(obj_arr[j].text.name == ssplit[8]){
+                                        ssplit[9] = {parent:obj_arr[j],text:{name: ssplit[9]},link:{href:"javascript:getContents3(`"+xxx[i].children[0].innerHTML+"`)"}}
+                                        obj_arr.push(ssplit[9])
+                                    }
+                                }
+                        }
+                        simple_chart_config3 = obj_arr
+                        cls()
+                        var my_chart3 = new Treant(simple_chart_config3);
+                    }
+                }
+                }
+                xhr.open("GET", url,true);
+                xhr.overrideMimeType('text/xml');
+                xhr.send();
+            }
+
+            function intermediatefetch(name,url){
+                var xhhr =  new XMLHttpRequest();
+                xhhr.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        inDoc = xhhr.responseXML;
+                        xxhhr = inDoc.getElementsByTagName("Name");
+                        getContents3(xxhhr[0].children[0].innerHTML)
+                    }
+                }
+                xhhr.open("GET", url,true);
+                xhhr.overrideMimeType('text/xml');
+                xhhr.send();
+            }
+
+            function firstcall(url,tag){
+                var xhr =  new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                    Doc = xhr.responseXML;
+                    xxx = Doc.getElementsByTagName(tag);
+                    if (xxx.length===0){
+                        var confirmBox = $("#confirm");
+                        confirmBox.find(".message").text("No Search Result Found");
+                        confirmBox.find(".yes").unbind().click(function() {
+                        confirmBox.hide();
+                        });
+                        confirmBox.find(".yes").click();
+                        confirmBox.show();
+                    }
+                    else{
+                        obj_arr=[];
+                        chart={
+                                container: "#tree-simple3",
+                                rootOrientation:  'NORTH', // NORTH || EAST || WEST || SOUTH
+                                siblingSeparation:   30,
+                                subTeeSeparation:    30,
+                                animateOnInit: true,
+                                connectors:{
+                                    style: {
+                                    'stroke':'#ff6600',
+                                    'arrow-end':'oval-wide-long'
+                                    }
+                                },
+                                node: {
+                                    collapsable: true,
+                                    HTMLclass: 'nodeExample1'
+                                },
+                                animation: {
+                                    nodeAnimation: "easeOutBounce",
+                                    nodeSpeed: 700,
+                                    connectorsAnimation: "bounce",
+                                    connectorsSpeed: 700
+                                }
+                            };
+                        obj_arr.push(chart)
+                        parentnode = {text: { name: ""+ip+":"+port }}
+                        
+                        obj_arr.push(parentnode)
+                        sub1=[];
+                        sub2=[];
+                        usr=[];
+                        for (i = 0; i< xxx.length; i++) {
+                            val_name=xxx[i].children[0].innerHTML
+                            val_uri=xxx[i].children[1].innerHTML
+                            inside_array = val_uri.split("/")
+                            if (!sub1.includes(inside_array[7])){
+                                sub1.push(inside_array[7])
+                                inside_array[7]={parent:parentnode,text:{name: inside_array[7]}}
+                                obj_arr.push(inside_array[7])
+                            }
+                            if(inside_array[8].search("User")>=0){
+                                if(!usr.includes(inside_array[8])){
+                                    usr.push(inside_array[8])
+                                    for(j=2;j<obj_arr.length;j++){
+                                        if(obj_arr[j].text.name == "User"){
+                                            console.log(inside_array[8],obj_arr[j].text.name)
+                                            inside_array[8] = {parent: obj_arr[j],text:{name:inside_array[8]}}
+                                            obj_arr.push(inside_array[8])
+                                        }
+                                    }
+                                }
+                            }
+                            else{
+                                ininner = inside_array[8].split("-")
+                                if (sub1.includes(ininner[0])){
+                                    if (!sub2.includes(inside_array[8])){
+                                        sub2.push(inside_array[8])
+                                        for(j=2;j<obj_arr.length;j++){
+                                            if(obj_arr[j].text.name == ininner[0]){
+                                                inside_array[8]={parent:obj_arr[j],text:{name: inside_array[8]}}
+                                                obj_arr.push(inside_array[8])
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        for(i=0;i<xxx.length;i++){
+                            v_name=xxx[i].children[0].innerHTML
+                            v_uri=xxx[i].children[1].innerHTML
+                            ssplit = v_uri.split("/")
+                            domi=ssplit[8].split("-")
+                                for(j=2;j<obj_arr.length;j++){
+                                    if(obj_arr[j].text.name == ssplit[8]){
+                                        ssplit[9] = {parent:obj_arr[j],text:{name: ssplit[9]},link:{href:"javascript:intermediatefetch(`"+v_name+"`,`"+xxx[i].children[1].innerHTML+"`)"}}
+                                        obj_arr.push(ssplit[9])
+                                    }
+                                }
+                            
+                        }
+                        console.log(obj_arr)
+                        simple_chart_config3 = obj_arr
+                        cls()
+                        var my_chart3 = new Treant(simple_chart_config3);
+                    }   
+                }
+                }
+                xhr.open("GET", url,true);
+                xhr.overrideMimeType('text/xml');
+                xhr.send();
+            }
+
+            function calluri() {
+                // ip = window.sessionStorage.getItem("ip");
+                // port = window.sessionStorage.getItem("port");
+                ip = "143.110.179.157"
+                port = "3000"
+                console.log(ip,port)
+                base_url = "http://"+ip+":"+port+"/Axon/MasterKube/search/masterkube"
+
+                search1 = document.getElementById("search1").value;
+                search2 = document.getElementById("search2").value;
+                search3 = document.getElementById("search3").value;
+                // search4 = document.getElementById("search4").value;
+
+                if (search3 == "" && search2 == "" && search1 != "") {
+                    firstcall(base_url+"?element="+search1,'Action')
+                }
+                if (search3 == "" && search2 != "" && search1 != "") {
+                    secondcall(base_url+"/"+search2+"?element="+search1)
+                }
+                if (search3 != "" && search2 != "" && search1 != "") {
+                    secondcall(base_url+"/"+search2+"?action="+search3+"&element="+search1)
+                }
+
+            }
+
+            function cls(){
+                document.getElementById("tree-simple3").innerHTML=""
+                document.getElementById("innerdata1").innerHTML=""
+                document.getElementById("innerdata").innerHTML=""
+                document.getElementById("innertable").innerHTML=""
+                document.getElementById("spldata").innerHTML=""
+            }
+            
+            function filter(){
+              document.getElementById("inputdata").innerHTML+=
+              "<input type='text' id='search2' class='form-control' placeholder='Process'>"
+              +"<input type='text' id='search3' class='form-control' placeholder='Action'>"
+              document.getElementById("filterbtn").innerHTML=""
+            }
+        </script>
+    </head>
+    <body onload="load()">
+        <div class="container-scroller">
+            <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+                <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+                  <a class="navbar-brand brand-logo mr-5" href="dashboard.html"><img src="images/Logo.png" class="mr-2" alt="logo"/></a>
+                </div>
+                <div class="navbar-menu-wrapper d-flex align-items-center">
+                    <ul class="navbar-nav mr-lg-2">
+                      <li class="nav-item nav-search d-none d-lg-block">
+                        <div class="input-group" id="inputdata">
+                          <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+                            <span class="input-group-text" id="search">
+                              <i class="fa fa-search" ></i>
+                            </span>
+                          </div>
+                          <span style="padding-left: 10%;"></span>
+                          <input type="text" id='search1' class='form-control' placeholder='Element'>
+                          
+                          <input type='text' id='search2' class='form-control' placeholder='Process'>
+                          <input type='text' id='search3' class='form-control' placeholder='Action'>
+                        </div>
+                      </li>
+                    </ul>
+                    <!-- <div id="filterbtn">
+                    <button class="btn btn-primary" onclick="filter()">Filters</button>
+                    </div> -->
+                    <button class="btn btn-primary" onclick="calluri()" >Search</button>
+                    <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+                        <a href="dashboard.html">
+                          Home
+                        </a>
+                    </div>
+                    <!-- <div class="justify-content-end">
+                      <a onclick="window.open('search.html','_blank')">
+                        <i class="text-primary" style="padding-left: 5px;"></i>
+                        Search
+                      </a>
+                    </div> -->
+                </div>
+            </nav>
+            <button class="btn btn-primary btn-rounded btn-fw" style="margin-top: 10px; align-items: center;" onclick="cls()">Clear Screen</button>
+            <!-- <div style="text-align: center;">
+                Search : <input type="text" class="form-control" id="search1"> <br>
+                Process : <input type="text" class="form-control" id="search2"> <br>
+                action : <input type="text" class="form-control" id="search3"> <br>
+            <button class="btn btn-primary" onclick="calluri()" >Search</button>
+            </div> -->
+
+        <div id="tree-simple3" style="height: auto;width: auto;"> </div>
+        <div id="innerdata1" style="margin-top: 20px; text-align: center;"></div>
+        <div style="float: right;" class="table" id="mesh"></div>
+        <div class="table grid-container" id="spldata"  style="margin-top: 20px;"></div>
+        <table class="table table-hover" style="width: auto;" id="innerdata"  style="margin-top: 20px;"></table>
+        <table class="table table-hover" style="width: auto;" id="innertable"  style="margin-top: 20px;"></table>
+        <div id="auxdata"></div>
+        <div id="searchaux"></div>
+        <div id="confirm">
+          <div class="message"></div><br>
+          <button class="yes">Close</button>
+       </div>
+        </div>
+
+    </body>
+</html>
