@@ -354,8 +354,9 @@
                   // drawgraph()
                 }
               }
-              rreq.open("GET", url_fire1,true);
+              rreq.open("GET", proxy+url_fire1,true);
               rreq.overrideMimeType('text/xml');
+              rreq.setRequestHeader('username', user);
               rreq.send(); 
             }
             else{
@@ -394,16 +395,18 @@
                   // drawgraph()
                 }
               }
-              rreq.open("GET", in_url,true);
+              rreq.open("GET", proxy+in_url,true);
               rreq.overrideMimeType('text/xml');
+              rreq.setRequestHeader('username', user);
               rreq.send(); 
             }
           }
         } 
       }
     }
-    req.open("GET", url,true);
+    req.open("GET", proxy+url,true);
     req.overrideMimeType('text/xml');
+    req.setRequestHeader('username', user);
     req.send(); 
   }
 
@@ -467,7 +470,8 @@
     }
     const posturl= "http://"+ip+":"+port+"/Axon/action/submitPayLoadService.jsp?"+postdata
 
-    posthttp.open("POST", posturl);
+    posthttp.open("POST", proxy+posturl);
+    posthttp.setRequestHeader('username', user);
     posthttp.send();
 
   }
@@ -488,8 +492,9 @@
       }
       const nameurl= "http://"+ip+":"+port+"/Axon/getNameData.jsp?elt="+elt+"&q="+que
 
-      namehttp.open("GET", nameurl);
+      namehttp.open("GET", proxy+nameurl);
       namehttp.overrideMimeType('text/xml');
+      namehttp.setRequestHeader('username', user);
       namehttp.send();
     }
 
@@ -614,14 +619,16 @@
               }
             }
           }
-          xr[i].open("GET", inner_url,true);
+          xr[i].open("GET", proxy+inner_url,true);
           xr[i].overrideMimeType('text/xml');
+          xr[i].setRequestHeader('username', user);
           xr[i].send();
         }
       }
     }
-    xhr.open("GET", url,true);
+    xhr.open("GET", proxy+url,true);
     xhr.overrideMimeType('text/xml');
+    xhr.setRequestHeader('username', user);
     xhr.send(); 
   }
 
@@ -672,8 +679,9 @@
             var my_chart3 = new Treant(simple_chart_config3);
         }
       }
-      xhr.open("GET", url,true);
+      xhr.open("GET", proxy+url,true);
       xhr.overrideMimeType('text/xml');
+      xhr.setRequestHeader('username', user);
       xhr.send();
   }
   
@@ -722,8 +730,9 @@
         var my_chart2 = new Treant(simple_chart_config2);
         }
       }
-      http.open("GET", url,true);
+      http.open("GET", proxy+url,true);
       http.overrideMimeType('text/xml');
+      http.setRequestHeader('username', user);
       http.send();
     }
 
@@ -764,7 +773,9 @@
   function load(){
     ip = window.sessionStorage.getItem("ip");
     port = window.sessionStorage.getItem("port");
-    console.log(ip,port)
+    proxy = window.sessionStorage.getItem("proxy");
+    user = window.sessionStorage.getItem("user")
+    console.log(ip,port,proxy,user)
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
@@ -778,8 +789,9 @@
         fun(json_arr);
       }
     }
-    xmlhttp.open("GET", "http://"+ip+":"+port+"/Axon/MasterKube/general/masterkube",true);
+    xmlhttp.open("GET", proxy+"http://"+ip+":"+port+"/Axon/MasterKube/general/masterkube",true);
     xmlhttp.overrideMimeType('text/xml');
+    xmlhttp.setRequestHeader('username', user);
     xmlhttp.send();	
   }
 
