@@ -315,10 +315,13 @@
           }
           else{
             if (res1[0].children[2].innerHTML.search("/2/Tell") > 0){
+              // console.log("log",res1[0].children[2].innerHTML)
               var temp_url = res1[0].children[2].innerHTML
-              var temp_name = res1[0].children[0].innerHTML
-              var url_fire = temp_url.replace(temp_name,temp_name.slice(2,temp_name.length))
-              var url_fire1 = temp_url.replace("2","1")
+              // var temp_name = res1[0].children[0].innerHTML
+              // var url_fire = temp_url.replace(temp_name,temp_name.slice(2,temp_name.length))
+              // var url_fire1 = temp_url.replace("2","1")
+              var url_fire1 = temp_url.replace("/2/Tell", "/1/Tell")
+              // console.log("log2",url_fire1);
               var rreq = new XMLHttpRequest();
               rreq.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -332,6 +335,7 @@
                     if (rres1[i].children[1].innerHTML=="name") {
                       getroot(rres1[i].children[2].innerHTML)
                       hd1.push("Pointer")
+                      // console.log(rres1[i].children[2].innerHTML)
                       td1.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button>")
                       //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button></td></tr>";
                     }
@@ -844,7 +848,7 @@
           <!-- <div class="main-panel">           -->
             <ul id="mylist"></ul>
             <div id="demo"></div>
-            <button class="btn btn-primary btn-rounded btn-fw" onclick="cls()"  style="margin-top: 10px; align-items: center;" >Home</button>
+            <button class="btn btn-primary btn-rounded btn-fw" onclick="cls()"  style="margin-top: 16px; align-items: center; font-weight: bold;" >Home</button>
             <!-- <button onclick="showgraph()">Show relation</button> -->
             <div id="tree-simple" style="width:100%; height: 100%;"> </div>
             <div id="tree-simple2" style="width:100%; height: 100%;"> </div>

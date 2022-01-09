@@ -269,9 +269,10 @@
                             else{
                                 if (xxxr[0].children[2].innerHTML.search("/2/Tell") > 0){
                                 var temp_url = xxxr[0].children[2].innerHTML
-                                var temp_name = xxxr[0].children[0].innerHTML
-                                var url_fire = temp_url.replace(temp_name,temp_name.slice(2,temp_name.length))
-                                var url_fire1 = temp_url.replace("2","1")
+                                // var temp_name = xxxr[0].children[0].innerHTML
+                                // var url_fire = temp_url.replace(temp_name,temp_name.slice(2,temp_name.length))
+                                // var url_fire1 = temp_url.replace("2","1")
+                                var url_fire1 = temp_url.replace("/2/Tell", "/1/Tell")
                                 var rreq = new XMLHttpRequest();
                                 rreq.onreadystatechange = function() {
                                     if (this.readyState == 4 && this.status == 200) {

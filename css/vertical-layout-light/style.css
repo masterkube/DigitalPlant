@@ -8698,7 +8698,7 @@
 }
 
 html {
-  font-family: sans-serif;
+  font-family: exo;
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -8710,7 +8710,7 @@ article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: exo;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
@@ -11084,6 +11084,7 @@ fieldset:disabled .wizard > .actions a,
   color: #fff;
   background-color: #1848a0;
   border-color: #000000;
+  font-family: exo;
 }
 
 .btn-primary:hover, .wizard > .actions a:hover {
@@ -15261,7 +15262,7 @@ a.close.disabled {
   z-index: 1060;
   display: block;
   max-width: 276px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family:exo;
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
@@ -19434,7 +19435,7 @@ input:focus {
 /* Typography */
 body {
   font-size: 1rem;
-  font-family: "Nunito", sans-serif;
+  font-family: exo;
   font-weight: initial;
   line-height: normal;
   -webkit-font-smoothing: antialiased;
@@ -20885,6 +20886,7 @@ code {
   font-size: 0.875rem;
   line-height: 1;
   font-weight: 400;
+  font-family: exo;
   border-radius: 15px;
   /* Buttons with only icons */
   /* Buttons with icon and text */
@@ -26405,7 +26407,7 @@ table.dataTable tbody td.select-checkbox:after {
 
 .datepicker.datepicker-dropdown .datepicker-days table.table-condensed thead tr th.dow,
 .datepicker.datepicker-inline .datepicker-days table.table-condensed thead tr th.dow {
-  font-family: "Nunito", sans-serif;
+  font-family: exo;
   color: #1F1F1F;
   font-size: 0.875rem;
   font-weight: initial;
@@ -28470,7 +28472,7 @@ div.tagsinput span.tag a {
 .sidebar {
   min-height: calc(100vh - 60px);
   background: #0e2a5d;
-  font-family: "Nunito", sans-serif;
+  font-family: exo;
   font-weight: 500;
   padding: 0;
   width: 235px;
@@ -30320,7 +30322,7 @@ div.tagsinput span.tag a {
 .settings-panel .settings-heading {
   padding: 16px 0 13px 35px;
   font-size: 0.875rem;
-  font-family: "Nunito", sans-serif;
+  font-family: exo;
   font-weight: 500;
   line-height: 1;
   color: rgba(255, 255, 255, 0.9);
@@ -30517,7 +30519,7 @@ div.tagsinput span.tag a {
 }
 
 .settings-panel .events p {
-  font-family: "Nunito", sans-serif;
+  font-family: exo;
   font-weight: 400;
 }
 
