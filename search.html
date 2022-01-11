@@ -142,7 +142,8 @@
                 }
                 const posturl= "http://"+ip+":"+port+"/Axon/action/submitPayLoadService.jsp?"+postdata
 
-                posthttp.open("POST", posturl);
+                posthttp.open("POST",proxy+posturl);
+                posthttp.setRequestHeader('username', user);
                 posthttp.send();
 
             }
@@ -163,8 +164,9 @@
                 }
                 const nameurl= "http://"+ip+":"+port+"/Axon/getNameData.jsp?elt="+elt+"&q="+que
 
-                namehttp.open("GET", nameurl);
+                namehttp.open("GET", proxy+nameurl);
                 namehttp.overrideMimeType('text/xml');
+                namehttp.setRequestHeader('username', user);
                 namehttp.send();
                 }
             }
@@ -308,8 +310,9 @@
                                     // drawgraph()
                                     }
                                 }
-                                rreq.open("GET", url_fire1,true);
+                                rreq.open("GET",proxy+url_fire1,true);
                                 rreq.overrideMimeType('text/xml');
+                                rreq.setRequestHeader('username', user);
                                 rreq.send(); 
                                 }
                                 else{
@@ -348,16 +351,18 @@
                                     // drawgraph()
                                     }
                                 }
-                                rreq.open("GET", in_url,true);
+                                rreq.open("GET",proxy+in_url,true);
                                 rreq.overrideMimeType('text/xml');
+                                rreq.setRequestHeader('username', user);
                                 rreq.send(); 
                                 }
                             }
                         }
                     }
                 }
-                xhr.open("GET", url,true);
+                xhr.open("GET",proxy+url,true);
                 xhr.overrideMimeType('text/xml');
+                xhr.setRequestHeader('username', user);
                 xhr.send();
             }
 
@@ -460,8 +465,9 @@
                     }
                 }
                 }
-                xhr.open("GET", url,true);
+                xhr.open("GET",proxy+url,true);
                 xhr.overrideMimeType('text/xml');
+                xhr.setRequestHeader('username', user);
                 xhr.send();
             }
 
@@ -474,8 +480,9 @@
                         getContents3(xxhhr[0].children[0].innerHTML)
                     }
                 }
-                xhhr.open("GET", url,true);
+                xhhr.open("GET", proxy+url,true);
                 xhhr.overrideMimeType('text/xml');
+                xhhr.setRequestHeader('username', user);
                 xhhr.send();
             }
 
@@ -582,18 +589,22 @@
                     }   
                 }
                 }
-                xhr.open("GET", url,true);
+                xhr.open("GET", proxy+url,true);
                 xhr.overrideMimeType('text/xml');
+                xhr.setRequestHeader('username', user);
                 xhr.send();
             }
 
             function calluri() {
-                // ip = window.sessionStorage.getItem("ip");
-                // port = window.sessionStorage.getItem("port");
-                ip = "143.110.179.157"
-                port = "3000"
-                console.log(ip,port)
-                base_url = "http://"+ip+":"+port+"/Axon/MasterKube/search/masterkube"
+                
+                ip = window.sessionStorage.getItem("ip");
+                port = window.sessionStorage.getItem("port");
+                proxy = window.sessionStorage.getItem("proxy");
+                user = window.sessionStorage.getItem("user")
+                // ip = "143.110.179.157"
+                // port = "3000"
+                // console.log(ip,port)
+                base_url = proxy+"http://"+ip+":"+port+"/Axon/MasterKube/search/masterkube"
 
                 search1 = document.getElementById("search1").value;
                 search2 = document.getElementById("search2").value;
@@ -628,7 +639,7 @@
             }
         </script>
     </head>
-    <body onload="load()">
+    <body>
         <div class="container-scroller">
             <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
                 <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">

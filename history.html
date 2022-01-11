@@ -36,7 +36,7 @@
                 padding: 3rem 0;
             }
             .wrapper {
-                padding-left: 30%;
+                padding-left: 18%;
                 width: auto;
                 height: auto;
             }
@@ -131,6 +131,13 @@
           text-align: center;
           margin-top: 5px;
         }
+
+        td {
+            height: 80px;
+            width: 160px;
+            text-align: center;
+            vertical-align: middle;
+        }
  
         </style>
 
@@ -156,8 +163,9 @@
                             document.getElementById("para"+n).innerHTML=totdata
                     }
                 }
-                xhr.open("GET", url,true);
+                xhr.open("GET", proxy+url,true);
                 xhr.overrideMimeType('text/xml');
+                xhr.setRequestHeader('username', user);
                 xhr.send();
             }
 
@@ -181,16 +189,18 @@
                         confirmBox.show();
                     }
                     else{
-                        document.getElementById("listtime").innerHTML=""
+                        document.getElementById("listtime").innerHTML="<tr><th>User</th><th>Date</th><th>Action</th><th>Get Details</th></tr>"
                         for(i = 0; i < xr.length; i++){
                             fun_name = (xr[i].children[1].innerHTML).split("/")
-                            document.getElementById("listtime").innerHTML+="<li><div class='time'>User: "+xr[i].children[2].innerHTML+", Action: "+fun_name[10]+", <a href='javascript:getContents3(`"+xr[i].children[1].innerHTML+"`,`"+i+"`)'>Get Details</a></div><p id='para"+i+"'></p></li>"
+                            // document.getElementById("listtime").innerHTML+="<li><div class='time'>User: "+xr[i].children[2].innerHTML+", Action: "+fun_name[10]+", <a href='javascript:getContents3(`"+xr[i].children[1].innerHTML+"`,`"+i+"`)'>Get Details</a></div><p id='para"+i+"'></p></li>"
+                            document.getElementById("listtime").innerHTML+="<tr><td>"+xr[i].children[2].innerHTML+"</td><td>"+xr[i].children[0].innerHTML+"</td><td>"+fun_name[10]+"</td> <td><a href='javascript:getContents3(`"+xr[i].children[1].innerHTML+"`,`"+i+"`)'>Get Details</a><p id='para"+i+"'></p></td></tr>"
                         }
                     }
                 }
                 }
-                xhr.open("GET", base_url,true);
+                xhr.open("GET", proxy+base_url,true);
                 xhr.overrideMimeType('text/xml');
+                xhr.setRequestHeader('username', user);
                 xhr.send();
             }
         
@@ -231,15 +241,16 @@
                         }
                         },
                         nodeStructure: {
-                            text: { name: ""+ip+":"+port },
+                            text: { name: pname },
                             children: con_arr
                         }
                     }
                     var my_chart2 = new Treant(simple_chart_config2);
                     }
                 }
-                http.open("GET", url,true);
+                http.open("GET", proxy+url,true);
                 http.overrideMimeType('text/xml');
+                http.setRequestHeader('username', user);
                 http.send();
             }
 
@@ -279,7 +290,9 @@
         function load(){
             ip = window.sessionStorage.getItem("ip");
             port = window.sessionStorage.getItem("port");
-            console.log(ip,port)
+            proxy = window.sessionStorage.getItem("proxy");
+            user = window.sessionStorage.getItem("user")
+            
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
@@ -293,8 +306,9 @@
                 fun(json_arr);
             }
             }
-            xmlhttp.open("GET", "http://"+ip+":"+port+"/Axon/MasterKube/general/masterkube",true);
+            xmlhttp.open("GET",proxy+"http://"+ip+":"+port+"/Axon/MasterKube/general/masterkube",true);
             xmlhttp.overrideMimeType('text/xml');
+            xmlhttp.setRequestHeader('username', user);
             xmlhttp.send();	
         }
            
@@ -320,7 +334,9 @@
             <div id="tree-simple"> </div>
             <div id="tree-simple2"> </div>
             <div class="wrapper">
-                <ul class="sessions" id="listtime" style="color: #000000;">
+                <!-- <ul class="sessions" id="listtime" style="color: #000000;"> -->
+                <table class="table table-hover" style="width: auto;" style="margin-top: 20px; color: #000000;padding-left: 0px;" id="listtime">
+                </table>
                 </ul>
             </div>
             <div id="confirm">
