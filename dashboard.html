@@ -357,6 +357,9 @@
                   document.getElementById("innertable").innerHTML=tble1
                   // drawgraph()
                 }
+                if (this.status == 403 ){
+                  throwblocked();
+                }
               }
               rreq.open("GET", proxy+url_fire1,true);
               rreq.overrideMimeType('text/xml');
@@ -398,6 +401,9 @@
                   document.getElementById("innertable").innerHTML=tble
                   // drawgraph()
                 }
+                if (this.status == 403 ){
+                  throwblocked();
+                }
               }
               rreq.open("GET", proxy+in_url,true);
               rreq.overrideMimeType('text/xml');
@@ -406,6 +412,9 @@
             }
           }
         } 
+      }
+      if (this.status == 403 ){
+        throwblocked();
       }
     }
     req.open("GET", proxy+url,true);
@@ -471,6 +480,9 @@
           confirmBox.find(".yes").click();
           confirmBox.show();
       }
+      if (this.status == 403 ){
+        throwblocked();
+      }
     }
     const posturl= "http://"+ip+":"+port+"/Axon/action/submitPayLoadService.jsp?"+postdata
 
@@ -492,6 +504,9 @@
           // console.log(keyname, valuename);
           document.getElementById(tagele).value = valuename;
           document.getElementById("auxdata").innerHTML+="<input type='hidden' name='"+tagele+"' value='"+keyname+"'>"
+        }
+        if (this.status == 403 ){
+          throwblocked();
         }
       }
       const nameurl= "http://"+ip+":"+port+"/Axon/getNameData.jsp?elt="+elt+"&q="+que
@@ -622,12 +637,18 @@
                 }
               }
             }
+            if (this.status == 403 ){
+              throwblocked();
+            }
           }
           xr[i].open("GET", proxy+inner_url,true);
           xr[i].overrideMimeType('text/xml');
           xr[i].setRequestHeader('username', user);
           xr[i].send();
         }
+      }
+      if (this.status == 403 ){
+        throwblocked();
       }
     }
     xhr.open("GET", proxy+url,true);
@@ -682,6 +703,9 @@
             }
             var my_chart3 = new Treant(simple_chart_config3);
         }
+        if (this.status == 403 ){
+          throwblocked();
+        }
       }
       xhr.open("GET", proxy+url,true);
       xhr.overrideMimeType('text/xml');
@@ -732,6 +756,9 @@
             }
           }
         var my_chart2 = new Treant(simple_chart_config2);
+        }
+        if (this.status == 403 ){
+          throwblocked();
         }
       }
       http.open("GET", proxy+url,true);
@@ -792,11 +819,24 @@
         }
         fun(json_arr);
       }
+      if (this.status == 403 ){
+        throwblocked();
+      }
     }
     xmlhttp.open("GET", proxy+"http://"+ip+":"+port+"/Axon/MasterKube/general/masterkube",true);
     xmlhttp.overrideMimeType('text/xml');
     xmlhttp.setRequestHeader('username', user);
     xmlhttp.send();	
+  }
+
+  function throwblocked(){
+    var confirmBox = $("#confirm");
+    confirmBox.find(".message").text("Access Denied");
+    confirmBox.find(".yes").unbind().click(function() {
+    confirmBox.hide();
+    });
+    confirmBox.find(".yes").click();
+    confirmBox.show();
   }
 
   function cls(){

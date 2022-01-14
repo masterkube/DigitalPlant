@@ -162,6 +162,9 @@
                             }
                             document.getElementById("para"+n).innerHTML=totdata
                     }
+                    if (this.status == 403 ){
+                        throwblocked();
+                    }
                 }
                 xhr.open("GET", proxy+url,true);
                 xhr.overrideMimeType('text/xml');
@@ -169,6 +172,15 @@
                 xhr.send();
             }
 
+            function throwblocked(){
+                var confirmBox = $("#confirm");
+                confirmBox.find(".message").text("Access Denied");
+                confirmBox.find(".yes").unbind().click(function() {
+                confirmBox.hide();
+                });
+                confirmBox.find(".yes").click();
+                confirmBox.show();
+            }
 
             function calluri(url){
                 purl=url.split("/")
@@ -196,6 +208,9 @@
                             document.getElementById("listtime").innerHTML+="<tr><td>"+xr[i].children[2].innerHTML+"</td><td>"+xr[i].children[0].innerHTML+"</td><td>"+fun_name[10]+"</td> <td><a href='javascript:getContents3(`"+xr[i].children[1].innerHTML+"`,`"+i+"`)'>Get Details</a><p id='para"+i+"'></p></td></tr>"
                         }
                     }
+                }
+                if (this.status == 403 ){
+                    throwblocked();
                 }
                 }
                 xhr.open("GET", proxy+base_url,true);
@@ -246,6 +261,9 @@
                         }
                     }
                     var my_chart2 = new Treant(simple_chart_config2);
+                    }
+                    if (this.status == 403 ){
+                        throwblocked();
                     }
                 }
                 http.open("GET", proxy+url,true);
@@ -304,6 +322,9 @@
                     json_arr.push(tot);
                 }
                 fun(json_arr);
+            }
+            if (this.status == 403 ){
+                throwblocked();
             }
             }
             xmlhttp.open("GET",proxy+"http://"+ip+":"+port+"/Axon/MasterKube/general/masterkube",true);

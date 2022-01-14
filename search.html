@@ -139,6 +139,9 @@
                     confirmBox.find(".yes").click();
                     confirmBox.show();
                 }
+                if (this.status == 403 ){
+                    throwblocked();
+                }
                 }
                 const posturl= "http://"+ip+":"+port+"/Axon/action/submitPayLoadService.jsp?"+postdata
 
@@ -160,6 +163,9 @@
                     // console.log(keyname, valuename);
                     document.getElementById(tagele).value = valuename;
                     document.getElementById("auxdata").innerHTML+="<input type='hidden' name='"+tagele+"' value='"+keyname+"'>"
+                    }
+                    if (this.status == 403 ){
+                        throwblocked();
                     }
                 }
                 const nameurl= "http://"+ip+":"+port+"/Axon/getNameData.jsp?elt="+elt+"&q="+que
@@ -309,6 +315,9 @@
                                     document.getElementById("innertable").innerHTML=tble1
                                     // drawgraph()
                                     }
+                                    if (this.status == 403 ){
+                                        throwblocked();
+                                    }
                                 }
                                 rreq.open("GET",proxy+url_fire1,true);
                                 rreq.overrideMimeType('text/xml');
@@ -350,6 +359,9 @@
                                     document.getElementById("innertable").innerHTML=tble
                                     // drawgraph()
                                     }
+                                    if (this.status == 403 ){
+                                        throwblocked();
+                                    }
                                 }
                                 rreq.open("GET",proxy+in_url,true);
                                 rreq.overrideMimeType('text/xml');
@@ -358,6 +370,9 @@
                                 }
                             }
                         }
+                    }
+                    if (this.status == 403 ){
+                        throwblocked();
                     }
                 }
                 xhr.open("GET",proxy+url,true);
@@ -464,6 +479,9 @@
                         var my_chart3 = new Treant(simple_chart_config3);
                     }
                 }
+                if (this.status == 403 ){
+                    throwblocked();
+                }
                 }
                 xhr.open("GET",proxy+url,true);
                 xhr.overrideMimeType('text/xml');
@@ -478,6 +496,9 @@
                         inDoc = xhhr.responseXML;
                         xxhhr = inDoc.getElementsByTagName("Name");
                         getContents3(xxhhr[0].children[0].innerHTML)
+                    }
+                    if (this.status == 403 ){
+                        throwblocked();
                     }
                 }
                 xhhr.open("GET", proxy+url,true);
@@ -588,6 +609,9 @@
                         var my_chart3 = new Treant(simple_chart_config3);
                     }   
                 }
+                if (this.status == 403 ){
+                    throwblocked();
+                }
                 }
                 xhr.open("GET", proxy+url,true);
                 xhr.overrideMimeType('text/xml');
@@ -621,6 +645,16 @@
                     secondcall(base_url+"/"+search2+"?action="+search3+"&element="+search1)
                 }
 
+            }
+
+            function throwblocked(){
+                var confirmBox = $("#confirm");
+                confirmBox.find(".message").text("Access Denied");
+                confirmBox.find(".yes").unbind().click(function() {
+                confirmBox.hide();
+                });
+                confirmBox.find(".yes").click();
+                confirmBox.show();
             }
 
             function cls(){
