@@ -439,7 +439,7 @@
           tempp = encodeURIComponent(tempp.split('-').reverse().join("/"))
         }
         if(validatedate(document.getElementById(field+k).value) == true){
-          tempp = encodeURIComponent(tempp.split('-').reverse().join("/"))
+          tempp = encodeURIComponent(document.getElementById(field+k).value.split('-').reverse().join("/"))
         }
         else{
           try {
