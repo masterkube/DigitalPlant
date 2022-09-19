@@ -422,6 +422,11 @@
     req.setRequestHeader('username', user);
     req.send(); 
   }
+  
+  function validatedate(x){
+    var date_regex = /^\d{4}([./-])\d{2}\1\d{2}$/;
+    return date_regex.test(x);
+  }
 
   function postask1(url,data,field) {
     data = data.split(",")
@@ -432,6 +437,9 @@
         if ( data[k].toLowerCase().search("date") >= 0 ){
           var tempp = document.getElementById(field+k).value
           tempp = encodeURIComponent(tempp.split('-').reverse().join("/"))
+        }
+        if(validatedate(document.getElementById(field+k).value) == true){
+          tempp = encodeURIComponent(document.getElementById(field+k).value.split('-').reverse().join("/"))
         }
         else{
           try {
