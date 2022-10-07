@@ -99,9 +99,18 @@
             font: 10pt arial;
         }
         #mynetwork {
-            width: 1700px;
-            height: 1700px;
-            border: 1px solid lightgray;
+            width: 1550px; 
+            height: 600px;
+        }
+        #out{
+            color: #000000;
+            height: 150px;
+            width: 200px;
+        }
+        #inn{
+            color: #000000;
+            height: 150px;
+            width: 200px;
         }
  
         </style>
@@ -125,15 +134,13 @@
                     n = { id: xmlDoc[i].id, label: xmlDoc[i].label}
                     nodes.push(n);
                 }
-                //localStorage.setItem("nodes",nodes);
                 loadrelations(nodes)
             }
             if (this.status == 403 ){
                 throwblocked();
             }
             }
-            xmlhttp.open("GET","http://"+ip+":"+8000+"/axonapi/getnodes",true);
-            //xmlhttp.setRequestHeader('username', user);
+            xmlhttp.open("GET",proxy+"http://"+ip+":"+8000+"/axonapi/getnodes",true);
             xmlhttp.send();	
             
         }
@@ -160,9 +167,34 @@
                     throwblocked();
                 }
                 }
-                relationReq.open("GET","http://"+ip+":"+8000+"/axonapi/relation",true);
-                // relationReq.setRequestHeader('username', user);
+                relationReq.open("GET",proxy+"http://"+ip+":"+8000+"/axonapi/relation",true);
                 relationReq.send();
+        }
+
+        function getbounds(id){
+            ip = window.sessionStorage.getItem("ip");
+            port = window.sessionStorage.getItem("port");
+            proxy = window.sessionStorage.getItem("proxy");
+            user = window.sessionStorage.getItem("user")
+
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                xmlDoc = JSON.parse(xmlhttp.responseText);
+                for (i = 0; i< xmlDoc.length; i++) {
+                    if(id[0] == xmlDoc[i].id){
+                        document.getElementById("out").innerHTML = "<p><h2>OutBounds:</h2><hr>" + xmlDoc[i].outbounds + "</p>";
+                        document.getElementById("inn").innerHTML = "<p><h2>InBounds:</h2><hr>" + xmlDoc[i].inbounds + "</p>";
+                        break;
+                    }
+                }
+            }
+            if (this.status == 403 ){
+                throwblocked();
+            }
+            }
+            xmlhttp.open("GET",proxy+"http://"+ip+":"+8000+"/axonapi/getnodes",true);
+            xmlhttp.send();	
         }
 
         function drawnetwork(n,e) {
@@ -178,12 +210,14 @@
             
             var options = {
                 nodes: {
-                size: 200,
+                size: 20,
+                shape : "dot",
                 color: {
                     border: "#0e2a5d",
                     background: "#ff6600",
+                    highlight: "#0e2a5d"
                 },
-                font: { size: 20, color: "#eeeeee" },
+                font: { size: 20, color: "#0e2a5d" },
                 },
                 edges: {
                     color: "#0e2a5d", font: { size: 14, color: "#ff6600" }
@@ -193,16 +227,21 @@
                     enabled: false,
                     solver: "repulsion",
                     repulsion: {
-                        nodeDistance: 200 // Put more distance between the nodes.
+                        nodeDistance: 250 // Put more distance between the nodes.
                     }
                 }
             };
             network = new vis.Network(container, data, options);
             network.stabilize();
+            network.on( 'click', function(properties) {
+                var ids = properties.nodes;
+                getbounds(ids);
+            });
         }
 
         function load(){
             loadnodes()
+            setInterval(loadnodes,60000)
         }  
 
         </script>
@@ -223,5 +262,7 @@
             </nav>
             <div id="mynetwork"></div>
         </div>
+        <!-- <div id="out"></div>
+        <div id="inn"></div> -->
     </body>
 </html>
