@@ -99,8 +99,9 @@
             font: 10pt arial;
         }
         #mynetwork {
-            width: 1550px; 
-            height: 600px;
+            width: max-content; 
+            height: 800px;
+            padding-top: 2px;
         }
         #out{
             color: #000000;
@@ -112,7 +113,23 @@
             height: 150px;
             width: 200px;
         }
- 
+        #center{
+            display: flex;
+            align-items:flex-end;
+            justify-content: flex-end;
+            padding-top: 0px;
+        }
+        #confirmbutton {
+          background-color: #ff6600;
+          border-radius: 10px;
+          border: 4px solid rgb(255, 255, 255);
+          padding: 15px;
+          text-align: center;
+          width: max-content;
+          cursor: pointer;
+          color: #ffff;
+          font-size: 15px;
+        }
         </style>
 
         <script>
@@ -210,24 +227,35 @@
             
             var options = {
                 nodes: {
-                size: 20,
-                shape : "dot",
-                color: {
-                    border: "#0e2a5d",
-                    background: "#ff6600",
-                    highlight: "#0e2a5d"
+                    size: 35,
+                    shape : "dot",
+                    color: {
+                        border: "#0e2a5d",
+                        background: "#ff6600",
+                        highlight: "#0e2a5d"
+                    },
+                    font: { size: 30, color: "#0e2a5d" },
+                    scaling: {
+                        min: 16,
+                        max: 32,
+                    },
                 },
-                font: { size: 20, color: "#0e2a5d" },
+                width: "100%",
+                height: "100%",
+                interaction: {
+                    hover: true,
                 },
                 edges: {
-                    color: "#0e2a5d", font: { size: 14, color: "#ff6600" }
+                    color: "#0e2a5d", width: 5, size:25, font: { 
+                        color: "#ff6600", size:0,
+                    },smooth: false,
                 },
                 physics: {
                     // Even though it's disabled the options still apply to network.stabilize().
                     enabled: false,
                     solver: "repulsion",
                     repulsion: {
-                        nodeDistance: 250 // Put more distance between the nodes.
+                        nodeDistance: 200 // Put more distance between the nodes.
                     }
                 }
             };
@@ -237,11 +265,26 @@
                 var ids = properties.nodes;
                 getbounds(ids);
             });
+            network.on("hoverEdge", function (e) {
+            this.body.data.edges.update({
+                id: e.edge,
+                font: {
+                size: 30,
+                },
+            });
+            });
+            network.on("blurEdge", function (e) {
+            this.body.data.edges.update({
+                id: e.edge,
+                font: {
+                size: 0,
+                },
+            });
+            });
         }
 
         function load(){
             loadnodes()
-            setInterval(loadnodes,60000)
         }  
 
         </script>
@@ -260,6 +303,9 @@
                     </div>
                 
             </nav>
+            <div id="center">
+                <button onclick="loadnodes()" id="confirmbutton">Refresh</button>
+            </div>
             <div id="mynetwork"></div>
         </div>
         <!-- <div id="out"></div>
