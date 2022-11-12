@@ -4,16 +4,6 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <link rel="stylesheet" href="vendors/feather/feather.css">
-        <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
-        <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-        <!-- endinject -->
-        <!-- Plugin css for this page -->
-        <link rel="stylesheet" href="vendors/datatables.net-bs4/dataTables.bootstrap4.css">
-        <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
-        <link rel="stylesheet" type="text/css" href="js/select.dataTables.min.css">
-        <!-- End plugin css for this page -->
-        <!-- inject:css -->
         <link rel="stylesheet" href="css/vertical-layout-light/style.css">
         <link rel="stylesheet" href="css/style.css">
         <title> Axon History </title>
@@ -30,9 +20,7 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                padding: 0 1rem;
                 background: linear-gradient(45deg, #209cff, #68e0cf);
-                padding: 3rem 0;
             }
             h1 {
                 font-size: 1.1rem;
@@ -130,6 +118,11 @@
           color: #ffff;
           font-size: 15px;
         }
+        .SetLeftButton{
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
         </style>
 
         <script>
@@ -138,7 +131,7 @@
             ip = window.sessionStorage.getItem("ip");
             port = window.sessionStorage.getItem("port");
             proxy = window.sessionStorage.getItem("proxy");
-            user = window.sessionStorage.getItem("user")
+            user = window.sessionStorage.getItem("user");
 
             var nodes = [];
             var DIR = "images/";
@@ -148,7 +141,7 @@
             if (this.readyState == 4 && this.status == 200) {
                 xmlDoc = JSON.parse(xmlhttp.responseText);
                 for (i = 0; i< xmlDoc.length; i++) {
-                    n = { id: xmlDoc[i].id, label: xmlDoc[i].label}
+                    n = { id: xmlDoc[i].id, label: xmlDoc[i].label, group: xmlDoc[i].parentNode}
                     nodes.push(n);
                 }
                 loadrelations(nodes)
@@ -229,11 +222,6 @@
                 nodes: {
                     size: 35,
                     shape : "dot",
-                    color: {
-                        border: "#0e2a5d",
-                        background: "#ff6600",
-                        highlight: "#0e2a5d"
-                    },
                     font: { size: 30, color: "#0e2a5d" },
                     scaling: {
                         min: 16,
@@ -283,9 +271,18 @@
             });
         }
 
+        function setRefreshRate(){
+            let refresh = prompt("Set Refresh Rate (in seconds)");
+            setInterval(loadnodes,refresh*1000);
+        }
+
+        function clearRefreshRate(){
+            window.location.reload();
+        }
+        
         function load(){
             loadnodes()
-        }  
+        }
 
         </script>
     </head>
@@ -295,18 +292,19 @@
                 <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
                   <a class="navbar-brand brand-logo mr-5" href="dashboard.html"><img src="images/Logo.png" class="mr-2" alt="logo"/></a>
                 </div>
-               
                     <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-                        <a href="dashboard.html">
-                          Home
+                        <a onclick="setRefreshRate()" style="padding:5px;">
+                            Set Refresh
+                        </a>
+                        <a onclick="clearRefreshRate()" style="padding:5px;">
+                             Clear Refresh
                         </a>
                     </div>
-                
             </nav>
-            <div id="center">
+            <div class="SetLeftButton">
                 <button onclick="loadnodes()" id="confirmbutton">Refresh</button>
             </div>
-            <div id="mynetwork"></div>
+            <div id="mynetwork" style="padding-top: 25px;"></div>
         </div>
         <!-- <div id="out"></div>
         <div id="inn"></div> -->
