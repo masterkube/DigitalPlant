@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="css/vertical-layout-light/style.css">
         <link rel="stylesheet" href="css/style.css">
-        <title> Axon History </title>
+        <title>Digital Twin</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="shortcut icon" href="images/Shortcut Logo.png" />
@@ -261,6 +261,11 @@
                 },
             });
             });
+            network.on("hoverNode", function(properties){
+                let nodeObj= network.body.nodes[properties.node];
+                console.log(nodeObj)
+                document.getElementById("displayGroup").innerHTML = nodeObj.options.label+" belongs to "+"<span style='color:"+nodeObj.options.color.background+"'>"+nodeObj.options.group+"</span>";
+            });
             network.on("blurEdge", function (e) {
             this.body.data.edges.update({
                 id: e.edge,
@@ -299,10 +304,13 @@
                         <a onclick="clearRefreshRate()" style="padding:5px;">
                              Clear Refresh
                         </a>
+                        <a onclick="loadnodes()" style="padding:5px;">
+                            Refresh
+                       </a>
                     </div>
             </nav>
-            <div class="SetLeftButton">
-                <button onclick="loadnodes()" id="confirmbutton">Refresh</button>
+            <div>
+                <div id="displayGroup" style="font-weight: bolder;font-size: x-large;color:#000;padding-left: 43%"></div>
             </div>
             <div id="mynetwork" style="padding-top: 25px;"></div>
         </div>
