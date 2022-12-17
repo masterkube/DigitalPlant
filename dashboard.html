@@ -288,7 +288,6 @@
               for(i = 0;i<res1.length;i++){
                 if (res1[i].children[1].innerHTML=="name") {
                   if(res1[i].children.length>2){
-                    console.log("debug",res1[i].children.length,res1[i].children)
                     getroot(res1[i].children[2].innerHTML)
                     hd3.push("Pointer")
                     td3.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+res1[i].children[2].innerHTML+"`)'>"+res1[i].children[0].innerHTML+"</button>")
