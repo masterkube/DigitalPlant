@@ -273,21 +273,65 @@
           //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'> <input class='btn btn-primary btn-rounded btn-fw' type='submit' value='submit'> <input class='btn btn-primary btn-rounded btn-fw' type='reset' value='clear'> </td></tr></form>"
         }
         else{
-          var in_url = res1[0].children[2].innerHTML;
-          if (in_url.search("http")<0){
+          var in_url = ""
+          for(i = 0;i<res1.length;i++){
+            if(res1[0].children.length>2){
+              in_url = res1[0].children[2].innerHTML;
+            }else{
+              continue
+            }
+          }
+          if (in_url.search("http")>=0){
+            var hd3 =[]
+            var td3 =[]
+              //document.getElementById("innertable").innerHTML="<thead><tr><th>Data</th><th>Value</th></tr></thead>"
+              for(i = 0;i<res1.length;i++){
+                if (res1[i].children[1].innerHTML=="name") {
+                  if(res1[i].children.length>2){
+                    console.log("debug",res1[i].children.length,res1[i].children)
+                    getroot(res1[i].children[2].innerHTML)
+                    hd3.push("Pointer")
+                    td3.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+res1[i].children[2].innerHTML+"`)'>"+res1[i].children[0].innerHTML+"</button>")
+                  //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button></td></tr>";
+                  }else{
+                    continue
+                  }
+                }
+                else {
+                  if (res1[i].children.length > 2){
+                    hd3.push(res1[i].children[0].innerHTML)
+                    td3.push(res1[i].children[2].innerHTML)
+                  }
+                  // td1.push(rres1[i].children[2].innerHTML)
+                  //document.getElementById("innertable").innerHTML+="<tr><td>"+rres1[i].children[0].innerHTML+" :</td> <td>"+rres1[i].children[2].innerHTML+"</td></tr>"
+                }
+              }
+              var tble3 = "<thead><tr>"
+              for (var he3 of hd3){tble3+="<th>"+he3+"</th>"}
+              tble3+="</tr></thead>"
+              tble3+="<tr>"
+              for (var bd3 of td3){tble3+="<td>"+bd3+"</td>"}
+              tble3+="</tr>"
+              document.getElementById("innertable").innerHTML=tble3
+          }
+          else if (in_url.search("http")<0){
             var hd2 =[]
             var td2 =[]
               //document.getElementById("innertable").innerHTML="<thead><tr><th>Data</th><th>Value</th></tr></thead>"
               for(i = 0;i<res1.length;i++){
                 if (res1[i].children[1].innerHTML=="name") {
-                  getroot(res1[i].children[2].innerHTML)
-                  hd2.push("Pointer")
-                  td2.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+res1[i].children[2].innerHTML+"`)'>"+res1[i].children[0].innerHTML+"</button>")
-                  //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button></td></tr>";
+                  if(res1[i].children.length>2){
+                    getroot(res1[i].children[2].innerHTML)
+                    hd2.push("Pointer")
+                    td2.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+res1[i].children[2].innerHTML+"`)'>"+res1[i].children[0].innerHTML+"</button>")
+                    //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button></td></tr>";
+                  }else{
+                    continue
+                  }
                 }
                 else {
-                  hd2.push(res1[i].children[0].innerHTML)
-                  if (res1[i].children.length != 2){
+                  if (res1[i].children.length > 2){
+                    hd2.push(res1[i].children[0].innerHTML)
                     td2.push(res1[i].children[2].innerHTML)
                   }
                   // td1.push(rres1[i].children[2].innerHTML)
@@ -322,15 +366,19 @@
                   //document.getElementById("innertable").innerHTML="<thead><tr><th>Data</th><th>Value</th></tr></thead>"
                   for(i = 0;i<rres1.length;i++){
                     if (rres1[i].children[1].innerHTML=="name") {
-                      getroot(rres1[i].children[2].innerHTML)
-                      hd1.push("Pointer")
-                      // console.log(rres1[i].children[2].innerHTML)
-                      td1.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button>")
-                      //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button></td></tr>";
+                      if(rres1[i].children.length>2){
+                        getroot(rres1[i].children[2].innerHTML)
+                        hd1.push("Pointer")
+                        // console.log(rres1[i].children[2].innerHTML)
+                        td1.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button>")
+                        //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button></td></tr>";
+                      }else{
+                        continue
+                      }
                     }
                     else {
-                      hd1.push(rres1[i].children[0].innerHTML)
-                      if (rres1[i].children.length != 2){
+                      if (rres1[i].children.length > 2){
+                        hd1.push(rres1[i].children[0].innerHTML)
                         td1.push(rres1[i].children[2].innerHTML)
                       }
                       // td1.push(rres1[i].children[2].innerHTML)
@@ -367,14 +415,18 @@
                   //document.getElementById("innertable").innerHTML="<thead><tr><th>Data</th><th>Value</th></tr></thead>"
                   for(i = 0;i<rres1.length;i++){
                     if (rres1[i].children[1].innerHTML=="name") {
-                      getroot(rres1[i].children[2].innerHTML)
-                      hd.push("Pointer")
-                      td.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button>")
-                      //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button></td></tr>";
+                      if(rres1[i].children.length>2){
+                        getroot(rres1[i].children[2].innerHTML)
+                        hd.push("Pointer")
+                        td.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button>")
+                        //document.getElementById("innertable").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+rres1[i].children[2].innerHTML+"`)'>"+rres1[i].children[0].innerHTML+"</button></td></tr>";
+                      }else{
+                        continue
+                      }
                     }
                     else {
-                      hd.push(rres1[i].children[0].innerHTML)
-                      if (rres1[i].children.length!=2){
+                      if (rres1[i].children.length>2){
+                        hd.push(rres1[i].children[0].innerHTML)
                         td.push(rres1[i].children[2].innerHTML)
                       }
                       // td.push(rres1[i].children[2].innerHTML)
@@ -609,14 +661,18 @@
                   bodydata=[]
                   for (i = 0; i< xxxr.length;i++){
                     if (xxxr[i].children[1].innerHTML=="name") {
-                      getroot(xxxr[i].children[2].innerHTML)
-                      headdata.push("Pointer")
-                      bodydata.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+xxxr[i].children[2].innerHTML+"`)'>"+xxxr[i].children[0].innerHTML+"</button>")
-                      //document.getElementById("innerdata").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+xxxr[i].children[2].innerHTML+"`)'>"+xxxr[i].children[0].innerHTML+"</button></td></tr>";
+                      if(xxxr[i].children.length>2){
+                        getroot(xxxr[i].children[2].innerHTML)
+                        headdata.push("Pointer")
+                        bodydata.push("<button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+xxxr[i].children[2].innerHTML+"`)'>"+xxxr[i].children[0].innerHTML+"</button>")
+                        //document.getElementById("innerdata").innerHTML+="<tr><td colspan='2' style='text-align:center;'><button class='btn btn-primary btn-rounded btn-fw' onclick='getContent4(`"+xxxr[i].children[2].innerHTML+"`)'>"+xxxr[i].children[0].innerHTML+"</button></td></tr>";
+                      }else{
+                        continue
+                      }
                     }
                     else {
-                      headdata.push(xxxr[i].children[0].innerHTML)
-                      if(xxxr[i].children.length!=2){
+                      if(xxxr[i].children.length>2){
+                        headdata.push(xxxr[i].children[0].innerHTML)
                         bodydata.push(xxxr[i].children[2].innerHTML)
                       }
                       //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+"</td><td>"+xxxr[i].children[2].innerHTML+"</td></tr>";
@@ -907,13 +963,6 @@
      </div>
   <!-- container-scroller -->
 
-  <!-- plugins:js -->
-  <script src="vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <script src="vendors/chart.js/Chart.min.js"></script>
-  <script src="vendors/datatables.net/jquery.dataTables.js"></script>
-  <script src="vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
   <script src="js/dataTables.select.min.js"></script>
 
   <!-- End plugin js for this page -->
