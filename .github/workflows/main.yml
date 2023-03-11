@@ -24,3 +24,29 @@ jobs:
       
     - name: Docker Push
       run: docker push masterkube/console:2.0
+    
+    - name: 167 remote ssh commands using password
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
+        script: |
+          docker stop dsn
+          docker rm dsn
+          docker pull masterkube/console:2.0
+          docker run -d --name console -p 80:80 masterkube/console:2.0
+          
+    - name: 137 remote ssh commands using password
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.HOST2 }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD2 }}
+        port: ${{ secrets.PORT }}
+        script: |
+          docker stop dsn
+          docker rm dsn
+          docker pull masterkube/console:2.0
+          docker run -d --name console -p 80:80 masterkube/console:2.0
