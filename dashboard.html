@@ -483,7 +483,8 @@
         }
         else{
           try {
-            var interdata = document.getElementsByName(field+k)[0].value;
+            lenOfAutoName = document.getElementsByName(field+k).length-1;
+            var interdata = document.getElementsByName(field+k)[lenOfAutoName].value;
             var tempp = interdata
           }
           catch (error){
@@ -550,7 +551,7 @@
           var keyname = nameres.getElementsByTagName("key")[0].innerHTML;
           var valuename = nameres.getElementsByTagName("value")[0].innerHTML;
           document.getElementById(tagele).value = valuename;
-          document.getElementById("auxdata").innerHTML="<input type='hidden' name='"+tagele+"' value='"+keyname+"'>"
+          document.getElementById("auxdata").innerHTML+="<input type='hidden' name='"+tagele+"' value='"+keyname+"'>"
         }
         if (this.status == 403 ){
           throwblocked();
