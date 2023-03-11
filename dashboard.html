@@ -549,9 +549,8 @@
           const nameres = namehttp.responseXML
           var keyname = nameres.getElementsByTagName("key")[0].innerHTML;
           var valuename = nameres.getElementsByTagName("value")[0].innerHTML;
-          // console.log(keyname, valuename);
           document.getElementById(tagele).value = valuename;
-          document.getElementById("auxdata").innerHTML+="<input type='hidden' name='"+tagele+"' value='"+keyname+"'>"
+          document.getElementById("auxdata").innerHTML="<input type='hidden' name='"+tagele+"' value='"+keyname+"'>"
         }
         if (this.status == 403 ){
           throwblocked();
@@ -618,7 +617,7 @@
                   else if(xxxr[i].children[1].innerHTML=="name"){
                       //document.getElementById("innerdata").innerHTML+="<tr><td>"+xxxr[i].children[0].innerHTML+" :</td><td> <input class='form-control' type='text'> </td></tr>"
                       hea.push(xxxr[i].children[0].innerHTML)
-                      boa.push("<td> <input class='form-control' type='text' id='oneask"+i+"' onkeyup='getname(`"+xxxr[i].children[0].innerHTML+"`,`oneask"+i+"`)'> </td>")
+                      boa.push("<td> <input class='form-control' type='text' id='oneask"+i+"' onchange='getname(`"+xxxr[i].children[0].innerHTML+"`,`oneask"+i+"`)'> </td>")
                   }
                   else{
                     if(xxxr[i].children.length==3){
