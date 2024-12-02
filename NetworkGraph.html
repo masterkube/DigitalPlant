@@ -141,7 +141,7 @@
             if (this.readyState == 4 && this.status == 200) {
                 xmlDoc = JSON.parse(xmlhttp.responseText);
                 for (i = 0; i< xmlDoc.length; i++) {
-                    n = { id: xmlDoc[i].id, label: xmlDoc[i].label, group: xmlDoc[i].parentNode}
+                    n = { id: xmlDoc[i].id, label: xmlDoc[i].label, group: xmlDoc[i].parentnode}
                     nodes.push(n);
                 }
                 loadrelations(nodes)
