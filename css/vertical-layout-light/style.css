@@ -22586,21 +22586,6 @@ code {
   background: #282f3a;
 }
 
-/* Dropdowns */
-.dropdown .dropdown-toggle:after {
-  border-top: 0;
-  border-right: 0;
-  border-left: 0;
-  border-bottom: 0;
-  font: normal normal normal 24px/1 "themify";
-  content: "\e64b";
-  width: auto;
-  height: auto;
-  vertical-align: middle;
-  line-height: .625rem;
-  font-size: .875rem;
-  margin-left: .3rem;
-}
 
 .dropdown .dropdown-menu {
   margin-top: 2px;
@@ -24613,7 +24598,7 @@ dl li {
   border-top: 0;
   border-bottom-width: 1px;
   font-weight: 600;
-  font-size: .875rem;
+  font-size: 20px;
 }
 
 .table thead th i, .jsgrid .jsgrid-table thead th i {
@@ -24631,7 +24616,7 @@ dl li {
 
 .table td,
 .jsgrid .jsgrid-table td {
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .table td img, .jsgrid .jsgrid-table td img {
