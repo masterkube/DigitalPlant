@@ -472,7 +472,7 @@
           });
           confirmBox.find(".yes").click();
           confirmBox.show();
-          loadInitialData();
+          window.location.reload();
         }
       }
       if(posthttp.status == 500) {
@@ -752,7 +752,7 @@
   }
 
   function loadInitialData() {
-    window.allowedProcesses = [ "User","Models", "Assemblies", "TestChains", "TestModels"];
+    window.allowedProcesses = [ "User","Models", "Assemblies", "TestChains", "AssemblyTests", "SubAssemblies"];
     
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
@@ -793,6 +793,7 @@
 
           // Attach click event to load submenu items
           menuItem.onclick = function() {
+            cls();
             getContent(processUrl, 'Pid', processName, dropdownMenu);
           };
 
@@ -801,6 +802,18 @@
           dropdownContainer.appendChild(dropdownMenu);
           navbarMenuWrapper.appendChild(dropdownContainer);
         }
+        //add static menu to the navbarmenuwrapper
+        const visualizeMenu = document.createElement('a');
+        visualizeMenu.textContent = 'Visualize';
+        visualizeMenu.classList.add('text-primary');
+        visualizeMenu.style.paddingLeft = '5px';
+        visualizeMenu.style.marginLeft = '10px';
+        visualizeMenu.href = 'javascript:void(0);';
+        visualizeMenu.onclick = function() {
+          cls();
+          document.getElementById('visualizeDiv').style.display = 'block';
+        };
+        navbarMenuWrapper.appendChild(visualizeMenu);
       }
       if (this.status == 403) {
         throwblocked();
@@ -829,13 +842,14 @@
     document.getElementById("innertable").innerHTML=""
     document.getElementById("spldata").innerHTML=""
     document.getElementById("demo").innerHTML=""
-    
+    document.getElementById('visualizeDiv').style.display = 'none';
   }
 
   function clstable(){
     document.getElementById("innerdata").innerHTML=""
     document.getElementById("innertable").innerHTML=""
   }
+
 
  </script>
 
@@ -844,7 +858,7 @@
 <body onload="load()">
   <div id="video_wrapper">
     <div id="wrapper">
-     <div class="container-scroller">
+     <div>
           <!-- partial:partials/_navbar.html -->
           <nav class="navbar p-0 fixed-top d-flex flex-row" style="font-size: 15px;">
             <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
@@ -871,6 +885,9 @@
               <table class="table" style="width: auto;" id="innerdata"  style="margin-top: 20px; color: #000000;"></table>
               <table class="table" style="width: auto;" id="innertable"  style="margin-top: 20px; color: #000000;"></table>
               <div id="auxdata" ></div>
+              <div id="visualizeDiv" style="display: none; margin-top: 20px; text-align: center; color: #000000;">
+                <h3>Visualization Content</h3>
+              </div>
             </div>
             <div id="confirm">
               <div class="message" ></div><br>
