@@ -41,6 +41,8 @@
     .grid-container {
       display: grid;
       grid-template-columns: auto auto;
+      column-gap: 20px;
+      width: 250px;
     }
     .grid-item {
       background-color: inherit;
@@ -112,7 +114,31 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       border-radius: 8px;
       padding: 10px;
+      max-height: 25rem; /* Sets a maximum height */
+      overflow-y: auto; /* Enables scrolling only when necessary */
+  }
+
+    ::-webkit-scrollbar {
+      width: 12px;
     }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+      -webkit-border-radius: 10px;
+      border-radius: 10px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+      -webkit-border-radius: 10px;
+      border-radius: 10px;
+      background: rgba(255,0,0,0.8); 
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+  }
+  ::-webkit-scrollbar-thumb:window-inactive {
+      background: rgba(255,0,0,0.4); 
+  }
 
     .dropdown-item {
       color: #ffffff;
@@ -133,6 +159,7 @@
       color: #ffffff;
       border: none;
       border-radius: 12px;
+      padding: 10px;
       transition: background-color 0.3s, color 0.3s;
     }
     .btn:hover {
@@ -524,6 +551,7 @@
   }
 
   function getContents3(name,url){
+    clstable();
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
@@ -663,6 +691,50 @@
     xhr.send(); 
   }
 
+  function getAssembly(assembly) {
+    clstable();
+    var http = new XMLHttpRequest();
+    http.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        xDoc = http.responseXML;
+        const elements = xDoc.getElementsByTagName('Pid');
+        const assembliesDiv = document.getElementById('Assemblies');
+        assembliesDiv.innerHTML = ''; 
+
+        // Create a grid container
+        const gridContainer = document.createElement('div');
+        gridContainer.classList.add('grid-container');
+
+        for (let i = 0; i < elements.length; i++) {
+          const optionName = elements[i].children[0].innerHTML;
+          const optionValue = elements[i].children[1].innerHTML;
+          if(optionName == assembly){
+            // Create a grid item (button)
+            const gridItem = document.createElement('button');
+            gridItem.classList.add('grid-item', 'btn', 'btn-primary');
+            gridItem.textContent = optionName;
+            gridItem.onclick = function() {
+              getContent2(optionValue, 'Action', optionName);
+            };
+
+            // Append the grid item to the grid container
+            gridContainer.appendChild(gridItem);
+            document.getElementById("innerdata1").innerHTML="<h3>"+assembly + " : NextSubAssembly </h3><br>";
+          }
+        }
+        // Append the grid container to the Assemblies div
+        assembliesDiv.appendChild(gridContainer);
+      }
+      if (this.status == 403) {
+        throwblocked();
+      }
+    };
+    http.open("GET", proxy + "http://" + ip + ":" + port + "/Axon/MasterKube/general/masterkube/SubAssemblies", true);
+    http.overrideMimeType('text/xml');
+    http.setRequestHeader('username', user);
+    http.send();
+  }
+
   //left side menu
   function getContent2(url, tag, pname) {
     var xhr = new XMLHttpRequest();
@@ -687,12 +759,18 @@
 
           // Attach click event to call getContents3
           menuItem.onclick = function() {
+            if(val_name == "NextSubAssembly" && url.search("SubAssemblies") == -1){
+              getAssembly(pname);
+            }
+            else{
               getContents3(pname+" : "+val_name, val_uri);
+            }
           };
 
           // Append menu item to the container
           menuContainer.appendChild(menuItem);
         }
+        document.getElementById("innerdata1").innerHTML="<h3>"+pname+"</h3><br>";
       }
       if (this.status == 403) {
           throwblocked();
@@ -811,7 +889,8 @@
         visualizeMenu.href = 'javascript:void(0);';
         visualizeMenu.onclick = function() {
           cls();
-          document.getElementById('visualizeDiv').style.display = 'block';
+          window.open('NetworkMap.html', '_blank');
+          //document.getElementById('visualizeDiv').style.display = 'block';
         };
         navbarMenuWrapper.appendChild(visualizeMenu);
       }
@@ -842,12 +921,14 @@
     document.getElementById("innertable").innerHTML=""
     document.getElementById("spldata").innerHTML=""
     document.getElementById("demo").innerHTML=""
+    document.getElementById("Assemblies").innerHTML=""
     document.getElementById('visualizeDiv').style.display = 'none';
   }
 
   function clstable(){
     document.getElementById("innerdata").innerHTML=""
     document.getElementById("innertable").innerHTML=""
+    document.getElementById("Assemblies").innerHTML=""
   }
 
 
@@ -881,9 +962,10 @@
             <div id="tree-simple3"> </div>
             <div style="font-size: 25px;">
               <div id="innerdata1" style="display: flex; align-items: center; justify-content: center; margin-top: 20px; text-align: center; color: #000000;"></div>
-              <div class="table grid-container" id="spldata"  style="margin-top: 20px;"></div>
+              <div class="table grid-container" id="spldata"  style="margin-top: 20px; color: #000000;"></div>
               <table class="table" style="width: auto;" id="innerdata"  style="margin-top: 20px; color: #000000;"></table>
               <table class="table" style="width: auto;" id="innertable"  style="margin-top: 20px; color: #000000;"></table>
+              <div id="Assemblies" style="width: auto;margin-top: 20px; color: #000000;"></div>
               <div id="auxdata" ></div>
               <div id="visualizeDiv" style="display: none; margin-top: 20px; text-align: center; color: #000000;">
                 <h3>Visualization Content</h3>
